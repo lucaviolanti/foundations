@@ -1,9 +1,6 @@
 package exercises.generic
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
-import scala.util.{Failure, Success, Try}
 
 object GenericFunctionExercises {
 
@@ -17,20 +14,18 @@ object GenericFunctionExercises {
   case class Pair[A](first: A, second: A) {
     // 1a. Implement `swap` which exchanges `first` and `second`
     // such as Pair("John", "Doe").swap == Pair("Doe", "John")
-    def swap: Pair[A] =
-      ???
+    def swap: Pair[A] = Pair(second, first)
 
     // 1b. Implement `map` which applies a function to `first` and `second`
     // such as Pair("John", "Doe").map(_.length) == Pair(4,3)
-    def map[To](update: A => To): Pair[To] =
-      ???
+    def map[To](update: A => To): Pair[To] = Pair(update(first), update(second))
 
     // 1c. Implement `zipWith` which merges two Pairs using a `combine` function
     // such as Pair(0, 2).zipWith(Pair(3, 4))((x, y) => x + y) == Pair(3, 6)
     //         Pair(2, 3).zipWith(Pair("Hello ", "World "))(replicate) == Pair("Hello Hello ", "World World World ")
     // Bonus: Why did we separate the arguments of `zipWith` into two set of parentheses?
     def zipWith[Other, To](other: Pair[Other])(combine: (A, Other) => To): Pair[To] =
-      ???
+      Pair(combine(first, other.first), combine(second, other.second))
   }
 
   // 1d. Use the Pair API to decode the content of `secret`.
@@ -42,7 +37,10 @@ object GenericFunctionExercises {
       first = List(103, 110, 105, 109, 109, 97, 114, 103, 111, 114, 80),
       second = List(108, 97, 110, 111, 105, 116, 99, 110, 117, 70)
     )
-  lazy val decoded: Pair[String] = ???
+  val decoded: Pair[String] = secret
+    .map(bs => new String(bs.toArray.map(_.toChar)))
+    .map(_.reverse)
+    .swap
 
   // 1e. Use the Pair API to combine `productNames` and `productPrices` into `products`
   // such as products == Pair(Product("Coffee", 2.5), Product("Plane ticket", 329.99))
@@ -52,7 +50,7 @@ object GenericFunctionExercises {
   val productPrices: Pair[Double] = Pair(2.5, 329.99)
 
   lazy val products: Pair[Product] =
-    ???
+    productNames.zipWith(productPrices)(Product)
 
   //////////////////////////////////////////////
   // Bonus question (not covered by the video)
@@ -86,7 +84,7 @@ object GenericFunctionExercises {
     //         (isEven && isPositive)(-4) == false
     //         (isEven && isPositive)(-7) == false
     def &&(other: Predicate[A]): Predicate[A] =
-      ???
+      Predicate((a: A) => this(a) && other(a))
 
     // 2b. Implement `||` that combines two predicates using logical or
     // such as (isEven || isPositive)(12) == true
@@ -94,12 +92,12 @@ object GenericFunctionExercises {
     //         (isEven || isPositive)(-4) == true
     // but     (isEven || isPositive)(-7) == false
     def ||(other: Predicate[A]): Predicate[A] =
-      ???
+      Predicate((a: A) => this(a) || other(a))
 
     // 2c. Implement `flip` that reverses a predicate
     // such as isEven.flip(11) == true
     def flip: Predicate[A] =
-      ???
+      Predicate((a: A) => !this(a))
   }
 
   // 2d. Implement `isValidUser`, a predicate which checks if a `User` is:
