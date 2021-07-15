@@ -1,6 +1,7 @@
 package exercises.generic
 
 import exercises.generic.GenericFunctionExercises.PairSyntax._
+import exercises.generic.GenericFunctionExercises.Predicate._
 import exercises.generic.GenericFunctionExercises._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
@@ -52,11 +53,29 @@ class GenericFunctionExercisesTest extends AnyFunSuite with ScalaCheckDrivenProp
     assert(!(isEven && isPositive)(-7))
   }
 
+  test("Predicate && PBT") {
+    forAll { (f1: Int => Boolean, v: Int) =>
+      val p1 = Predicate(f1)
+
+      assert((p1 && True)(v) == p1(v))
+      assert(!(p1 && False)(v))
+    }
+  }
+
   test("Predicate ||") {
     assert((isEven || isPositive)(12))
     assert((isEven || isPositive)(11))
     assert((isEven || isPositive)(-4))
     assert(!(isEven || isPositive)(-7))
+  }
+
+  test("Predicate || PBT") {
+    forAll { (f1: Int => Boolean, v: Int) =>
+      val p1 = Predicate(f1)
+
+      assert((p1 || True)(v))
+      assert((p1 || False)(v) == p1(v))
+    }
   }
 
   test("Predicate flip") {

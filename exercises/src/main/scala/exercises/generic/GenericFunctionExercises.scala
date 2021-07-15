@@ -110,6 +110,11 @@ object GenericFunctionExercises {
       Predicate((a: A) => !this(a))
   }
 
+  object Predicate {
+    def False[A]: Predicate[A] = Predicate(_ => false)
+    def True[A]: Predicate[A]  = Predicate(_ => true)
+  }
+
   // 2d. Implement `isValidUser`, a predicate which checks if a `User` is:
   // * an adult (older than 18 year) and
   // * their name is longer than or equal to 3 characters and
