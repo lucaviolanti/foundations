@@ -108,6 +108,9 @@ object GenericFunctionExercises {
     // such as isEven.flip(11) == true
     def flip: Predicate[A] =
       Predicate((a: A) => !this(a))
+
+    def contramap[To](zoom: To => A): Predicate[To] =
+      Predicate(user => eval(zoom(user)))
   }
 
   object Predicate {
@@ -128,7 +131,14 @@ object GenericFunctionExercises {
   case class User(name: String, age: Int)
 
   lazy val isValidUser: Predicate[User] =
-    ???
+    byUser(_.age)(isOlderThan(18)) &&
+      byUser(_.name)(isLongerThan(3) && isCapitalised)
+
+  def byUser[To](zoom: User => To)(subPredicate: Predicate[To]): Predicate[User] =
+    subPredicate.contramap(zoom)
+  def isOlderThan(age: Int): Predicate[Int] = Predicate(_ >= age)
+  def isLongerThan(l: Int): Predicate[String] = Predicate(_.length >= l)
+  val isCapitalised: Predicate[String]        = Predicate(s => s == s.capitalize)
 
   ////////////////////////////
   // Exercise 3: JsonDecoder
