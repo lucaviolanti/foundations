@@ -1,6 +1,8 @@
 package exercises.generic
 
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import scala.util.Try
 
 object GenericFunctionExercises {
 
@@ -136,7 +138,7 @@ object GenericFunctionExercises {
 
   def byUser[To](zoom: User => To)(subPredicate: Predicate[To]): Predicate[User] =
     subPredicate.contramap(zoom)
-  def isOlderThan(age: Int): Predicate[Int] = Predicate(_ >= age)
+  def isOlderThan(age: Int): Predicate[Int]   = Predicate(_ >= age)
   def isLongerThan(l: Int): Predicate[String] = Predicate(_.length >= l)
   val isCapitalised: Predicate[String]        = Predicate(s => s == s.capitalize)
 
@@ -147,8 +149,15 @@ object GenericFunctionExercises {
   // very basic representation of JSON
   type Json = String
 
-  trait JsonDecoder[A] {
+  trait JsonDecoder[A] { self =>
     def decode(json: Json): A
+    def map[To](update: A => To): JsonDecoder[To] =
+      new JsonDecoder[To] {
+        override def decode(json: Json): To = update(self.decode(json))
+      }
+    def orElse(other: JsonDecoder[A]): JsonDecoder[A] = new JsonDecoder[A] {
+      override def decode(json: Json): A = Try(self.decode(json)).getOrElse(other.decode(json))
+    }
   }
 
   val intDecoder: JsonDecoder[Int] = new JsonDecoder[Int] {
@@ -171,8 +180,12 @@ object GenericFunctionExercises {
   // such as userIdDecoder.decode("1234") == UserId(1234)
   // but     userIdDecoder.decode("hello") would throw an Exception
   case class UserId(value: Int)
-  lazy val userIdDecoder: JsonDecoder[UserId] =
-    ???
+  lazy val userIdDecoder: JsonDecoder[UserId] = new JsonDecoder[UserId] {
+    override def decode(json: Json): UserId = UserId(intDecoder.decode(json))
+  }
+
+  lazy val userIdDecoderUsingMap: JsonDecoder[UserId]            = map(intDecoder)(UserId)
+  lazy val userIdDecoderUsingMapInsideTrait: JsonDecoder[UserId] = intDecoder.map(UserId)
 
   // 3b. Implement `localDateDecoder`, a `JsonDecoder` for `LocalDate`
   // such as localDateDecoder.decode("\"2020-03-26\"") == LocalDate.of(2020,3,26)
@@ -180,14 +193,24 @@ object GenericFunctionExercises {
   // and     localDateDecoder.decode("hello") would throw an Exception
   // Note: You can parse a `LocalDate` using `LocalDate.parse` with a java.time.format.DateTimeFormatter
   // e.g. DateTimeFormatter.ISO_LOCAL_DATE
-  lazy val localDateDecoder: JsonDecoder[LocalDate] =
-    ???
+  lazy val localDateDecoder: JsonDecoder[LocalDate] = new JsonDecoder[LocalDate] {
+    override def decode(json: Json): LocalDate =
+      LocalDate.parse(stringDecoder.decode(json), DateTimeFormatter.ISO_LOCAL_DATE)
+  }
+
+  lazy val localDateDecoderUsingMap: JsonDecoder[LocalDate] =
+    map(stringDecoder)(LocalDate.parse(_, DateTimeFormatter.ISO_LOCAL_DATE))
+
+  lazy val localDateDecoderUsingMapInsideTrait: JsonDecoder[LocalDate] =
+    stringDecoder.map(LocalDate.parse(_, DateTimeFormatter.ISO_LOCAL_DATE))
 
   // 3c. Implement `map` a generic function that converts a `JsonDecoder` of `From`
   // into a `JsonDecoder` of `To`.
   // Bonus: Can you re-implement `userIdDecoder` and `localDateDecoder` using `map`
   def map[From, To](decoder: JsonDecoder[From])(update: From => To): JsonDecoder[To] =
-    ???
+    new JsonDecoder[To] {
+      override def decode(json: Json): To = update(decoder.decode(json))
+    }
 
   // 3d. Move `map` inside of `JsonDecoder` trait so that we can use the syntax
   // `intDecoder.map(_ + 1)` instead of `map(intDecoder)(_ + 1)`
@@ -200,8 +223,22 @@ object GenericFunctionExercises {
   // but weirdLocalDateDecoder.decode("hello") would throw an Exception
   // Try to think how we could extend JsonDecoder so that we can easily implement
   // other decoders that follow the same pattern.
-  lazy val weirdLocalDateDecoder: JsonDecoder[LocalDate] =
-    ???
+  lazy val weirdLocalDateDecoder: JsonDecoder[LocalDate] = {
+//  new JsonDecoder[LocalDate] {
+//    override def decode(json: Json): LocalDate = {
+//      val firstTry                   = Try(localDateDecoderUsingMapInsideTrait.decode(json))
+//      lazy val daysSinceEpochDecoder = LocalDate.ofEpochDay(json.toLong)
+//
+//      firstTry.getOrElse(daysSinceEpochDecoder)
+//    }
+
+//    (json: Json) =>
+//      Try(localDateDecoderUsingMapInsideTrait.decode(json)).getOrElse(LocalDate.ofEpochDay(json.toLong))
+
+    val longJsonDecoder: JsonDecoder[Long]           = _.toLong
+    val longLocalDateDecoder: JsonDecoder[LocalDate] = longJsonDecoder.map(LocalDate.ofEpochDay)
+    localDateDecoder orElse longLocalDateDecoder
+  }
 
   //////////////////////////////////////////////
   // Bonus question (not covered by the video)

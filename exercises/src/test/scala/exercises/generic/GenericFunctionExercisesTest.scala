@@ -1,10 +1,14 @@
 package exercises.generic
 
+import exercises.action.DateGenerator.localDateArb
 import exercises.generic.GenericFunctionExercises.PairSyntax._
 import exercises.generic.GenericFunctionExercises.Predicate._
 import exercises.generic.GenericFunctionExercises._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class GenericFunctionExercisesTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
 
@@ -93,10 +97,65 @@ class GenericFunctionExercisesTest extends AnyFunSuite with ScalaCheckDrivenProp
   // Exercise 3: JsonDecoder
   ////////////////////////////
 
-  test("JsonDecoder UserId") {}
+  test("JsonDecoder UserId") {
+    assert(userIdDecoder.decode("1234") == UserId(1234))
+    assertThrows[NumberFormatException](userIdDecoder.decode("hello"))
 
-  test("JsonDecoder LocalDate") {}
+    assert(userIdDecoderUsingMap.decode("1234") == UserId(1234))
+    assertThrows[NumberFormatException](userIdDecoderUsingMap.decode("hello"))
+  }
 
-  test("JsonDecoder weirdLocalDateDecoder") {}
+  test("JsonDecoder UserId round-trip") {
+    forAll { (n: Int) =>
+      assert(userIdDecoder.decode(n.toString) == UserId(n))
 
+      assert(userIdDecoderUsingMap.decode(n.toString) == UserId(n))
+
+      assert(userIdDecoderUsingMapInsideTrait.decode(n.toString) == UserId(n))
+    }
+  }
+
+  test("JsonDecoder LocalDate") {
+    assert(localDateDecoder.decode("\"2020-03-26\"") == LocalDate.of(2020, 3, 26))
+    assertThrows[IllegalArgumentException](localDateDecoder.decode("2020-03-26"))
+    assertThrows[IllegalArgumentException](localDateDecoder.decode("hello"))
+
+    assert(localDateDecoderUsingMap.decode("\"2020-03-26\"") == LocalDate.of(2020, 3, 26))
+    assertThrows[IllegalArgumentException](localDateDecoderUsingMap.decode("2020-03-26"))
+    assertThrows[IllegalArgumentException](localDateDecoderUsingMap.decode("hello"))
+
+    assert(localDateDecoderUsingMapInsideTrait.decode("\"2020-03-26\"") == LocalDate.of(2020, 3, 26))
+    assertThrows[IllegalArgumentException](localDateDecoderUsingMapInsideTrait.decode("2020-03-26"))
+    assertThrows[IllegalArgumentException](localDateDecoderUsingMapInsideTrait.decode("hello"))
+  }
+
+  test("JsonDecoder LocalDate round-trip") {
+    forAll { (date: LocalDate) =>
+      val dateJson = s"""\"${DateTimeFormatter.ISO_LOCAL_DATE.format(date)}\""""
+      assert(localDateDecoder.decode(dateJson) == date)
+
+      assert(localDateDecoderUsingMap.decode(dateJson) == date)
+
+      assert(localDateDecoderUsingMapInsideTrait.decode(dateJson) == date)
+    }
+  }
+
+//  implicit val arbitraryLocalDate: Arbitrary[LocalDate] = Arbitrary(
+//    Gen.choose(LocalDate.MIN.toEpochDay, LocalDate.MAX.toEpochDay)
+//      .map(LocalDate.ofEpochDay))
+
+  test("JsonDecoder weirdLocalDateDecoder") {
+    assert(weirdLocalDateDecoder.decode("\"2020-03-26\"") == LocalDate.of(2020, 3, 26))
+    assert(weirdLocalDateDecoder.decode("18347") == LocalDate.of(2020, 3, 26))
+    assertThrows[NumberFormatException](weirdLocalDateDecoder.decode("hello"))
+  }
+
+  test("JsonDecoder weirdLocalDateDecoder round-trip") {
+    forAll { (date: LocalDate) =>
+      val dateJson1 = s"""\"${DateTimeFormatter.ISO_LOCAL_DATE.format(date)}\""""
+      val dateJson2 = date.toEpochDay.toString
+      assert(weirdLocalDateDecoder.decode(dateJson1) == date)
+      assert(weirdLocalDateDecoder.decode(dateJson2) == date)
+    }
+  }
 }
