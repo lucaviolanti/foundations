@@ -60,6 +60,16 @@ object GenericFunctionExercises {
   // Pairs instead of 2? If yes, can you implement this method using `zipWith`?
   // Note: Libraries often call this method `map3` and `zipWith` is often called `map2`
 
+  object PairSyntax {
+    implicit class PairOps[A, B, C, D](pa: Pair[A]) {
+      def map3(pb: Pair[B], pc: Pair[C])(f: (A, B, C) => D): Pair[D] = {
+        val fabcd             = (a: A, b: B) => (c: C) => f(a, b, c)
+        val pcd: Pair[C => D] = pa.zipWith(pb)(fabcd)
+        pcd.zipWith(pc)((fcd: C => D, c: C) => fcd(c))
+      }
+    }
+  }
+
   ////////////////////////////
   // Exercise 2: Predicate
   ////////////////////////////

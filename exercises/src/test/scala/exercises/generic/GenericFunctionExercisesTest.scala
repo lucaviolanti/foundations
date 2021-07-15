@@ -1,5 +1,6 @@
 package exercises.generic
 
+import exercises.generic.GenericFunctionExercises.PairSyntax._
 import exercises.generic.GenericFunctionExercises._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
@@ -30,6 +31,14 @@ class GenericFunctionExercisesTest extends AnyFunSuite with ScalaCheckDrivenProp
 
   test("Pair productNames") {
     assert(products == Pair(Product("Coffee", 2.5), Product("Plane ticket", 329.99)))
+  }
+
+  test("Map3 works") {
+    assert(
+      decoded.map3(products, productPrices)((dec: String, prod: Product, price: Double) =>
+        s"$dec ${prod.name} = £${price}"
+      ) == Pair("Functional Coffee = £2.5", "Programming Plane ticket = £329.99")
+    )
   }
 
   ////////////////////////////
