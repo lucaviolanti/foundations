@@ -256,5 +256,4 @@ object GenericFunctionExercises {
 
   // 3g. `JsonDecoder` currently throws an exception if the input is not a valid JSON.
   // How could you change the API so that it doesn't happen anymore?
-
 }
