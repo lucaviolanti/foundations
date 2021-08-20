@@ -1,10 +1,10 @@
 package exercises.action.fp.search
 
-import java.time._
-
 import exercises.action.fp.IO
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
+
+import java.time._
 
 object SearchFlightGenerator {
 

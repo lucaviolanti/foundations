@@ -12,8 +12,8 @@ object JsonExercises {
       case _: JsonNumber   => json
       case JsonString(str) => JsonString(str.trim)
       case JsonObject(obj) =>
-        val newObj = obj.map {
-          case (key, value) => (key, trimAll(value))
+        val newObj = obj.map { case (key, value) =>
+          (key, trimAll(value))
         }
         JsonObject(newObj)
     }

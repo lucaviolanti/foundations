@@ -1,8 +1,5 @@
 package exercises.action
 
-import scala.annotation.tailrec
-import scala.util.{Failure, Success, Try}
-
 package object imperative {
 
   def greeting(): Unit =

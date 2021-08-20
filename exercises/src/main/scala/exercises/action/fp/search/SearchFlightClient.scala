@@ -1,8 +1,8 @@
 package exercises.action.fp.search
 
-import java.time.LocalDate
-
 import exercises.action.fp.IO
+
+import java.time.LocalDate
 
 // This interface represents the API used to contact a flight data provider such as:
 // British Airways, lastminute.com or Swissair

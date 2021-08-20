@@ -1,8 +1,8 @@
 package exercises.action
 
-import java.time.{Instant, LocalDate}
-
 import org.scalacheck.{Arbitrary, Gen}
+
+import java.time.{Instant, LocalDate}
 
 object DateGenerator {
   val dateGen: Gen[LocalDate] =

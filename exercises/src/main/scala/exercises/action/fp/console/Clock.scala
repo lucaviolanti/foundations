@@ -1,8 +1,8 @@
 package exercises.action.fp.console
 
-import java.time.Instant
-
 import exercises.action.fp.IO
+
+import java.time.Instant
 
 trait Clock {
   def now: IO[Instant]

@@ -68,5 +68,4 @@ class ForLoopExercisesTest extends AnyFunSuite with ScalaCheckDrivenPropertyChec
       assert(pattern(numbers, List.empty[Int])((number, prefix) => prefix :+ number) == numbers)
     }
   }
-
 }

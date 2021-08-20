@@ -1,15 +1,14 @@
 package exercises.dataprocessing
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.duration._
+import scala.concurrent.duration.{Duration, _}
 
 object TimeUtil {
 
   def bench[A](operation: String, iterations: Int, warmUpIterations: Int, ignore: Boolean = false)(
     function1: Labelled[() => A],
-    otherFunctions: Labelled[() => A]*, // hack to require 1 or more functions
-  ): Unit = {
-    if(ignore) () // do nothing
+    otherFunctions: Labelled[() => A]* // hack to require 1 or more functions
+  ): Unit =
+    if (ignore) () // do nothing
     else {
       println(s"[ $operation ]")
       println(s"  $iterations iterations, $warmUpIterations warm-up iterations")
@@ -18,18 +17,16 @@ object TimeUtil {
       val maxLabelLength  = allFunctions.map(_.name.length).max
       val times = allFunctions
         .map(
-          _.map(
-            function =>
-              1.to(totalIterations)
-                .map(_ => time(function())._2)
-                .drop(warmUpIterations)
+          _.map(function =>
+            1.to(totalIterations)
+              .map(_ => time(function())._2)
+              .drop(warmUpIterations)
           ).map(Elapsed.fromTime)
         )
         .sortBy(_.value.median)
 
       times.foreach(label => println(s"  ${label.padName(maxLabelLength)}: ${label.value}"))
     }
-  }
 
   case class Labelled[+A](name: String, value: A) {
     def map[To](update: A => To): Labelled[To] =

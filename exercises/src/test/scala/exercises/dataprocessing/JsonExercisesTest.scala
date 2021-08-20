@@ -1,8 +1,8 @@
 package exercises.dataprocessing
 
+import exercises.dataprocessing.JsonExercises._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import exercises.dataprocessing.JsonExercises._
 
 class JsonExercisesTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
   val john: Json = JsonObject(
@@ -12,9 +12,9 @@ class JsonExercisesTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks 
       "address" -> JsonObject(
         Map(
           "street-number" -> JsonNumber(25),
-          "street-name"   -> JsonString("  Cody Road"),
+          "street-name"   -> JsonString("  Cody Road")
         )
-      ),
+      )
     )
   )
 
@@ -27,9 +27,9 @@ class JsonExercisesTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks 
           "address" -> JsonObject(
             Map(
               "street-number" -> JsonNumber(25),
-              "street-name"   -> JsonString("Cody Road"),
+              "street-name"   -> JsonString("Cody Road")
             )
-          ),
+          )
         )
       )
     )
@@ -44,9 +44,9 @@ class JsonExercisesTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks 
           "address" -> JsonObject(
             Map(
               "street-number" -> JsonNumber(0),
-              "street-name"   -> JsonString("***"),
+              "street-name"   -> JsonString("***")
             )
-          ),
+          )
         )
       )
     )
