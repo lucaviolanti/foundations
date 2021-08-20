@@ -68,4 +68,36 @@ class ForLoopExercisesTest extends AnyFunSuite with ScalaCheckDrivenPropertyChec
       assert(pattern(numbers, List.empty[Int])((number, prefix) => prefix :+ number) == numbers)
     }
   }
+
+  test("map in terms of foldLeft behaves correctly") {
+    forAll { (numbers: List[Int]) =>
+      assert(ForLoopExercises.map(numbers)(_ + 1) == numbers.map(_ + 1))
+    }
+  }
+
+  test("reverse in terms of foldLeft behaves correctly") {
+    forAll { (numbers: List[Int]) =>
+      assert(ForLoopExercises.reverse(numbers) == numbers.reverse)
+    }
+  }
+
+  test("lastOption in terms of foldLeft behaves correctly") {
+    forAll { (numbers: List[Int]) =>
+      assert(ForLoopExercises.lastOption(numbers) == numbers.lastOption)
+      assert(ForLoopExercises.lastOption(Nil) == Nil.lastOption)
+      assert(ForLoopExercises.lastOption(List(false, true, false)) == List(false).lastOption)
+    }
+  }
+
+  test("generalMin in terms of foldLeft behaves correctly") {
+    forAll { (ints: List[Int]) =>
+      assert(ForLoopExercises.generalMin(ints) == ints.minOption)
+    }
+    forAll { (longs: List[Long]) =>
+      assert(ForLoopExercises.generalMin(longs) == longs.minOption)
+    }
+    forAll { (strings: List[String]) =>
+      assert(ForLoopExercises.generalMin(strings) == strings.minOption)
+    }
+  }
 }

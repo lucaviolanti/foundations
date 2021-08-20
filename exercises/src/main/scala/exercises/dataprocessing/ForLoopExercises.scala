@@ -89,21 +89,23 @@ object ForLoopExercises {
   // Do you want to give it a try? For example, can you implement
   // `map`, `reverse` and `lastOption` in terms of `foldLeft`
   def map[From, To](elements: List[From])(update: From => To): List[To] =
-    ???
+    elements.foldLeft(List.empty[To])((to, from) => to :+ update(from))
 
   // reverse(List(3,8,1)) == List(1,8,3)
   // reverse(Nil) == Nil
   def reverse[A](elements: List[A]): List[A] =
-    ???
+    elements.foldLeft(List.empty[A])((as, a) => a :: as)
 
   // lastOption(List(3,8,1)) == Some(1)
   // lastOption(Nil) == None
   def lastOption[A](elements: List[A]): Option[A] =
-    ???
+    elements.foldLeft(Option.empty[A])((_, a) => Some(a))
 
   // g. Can you generalise `min` so that it applies to more types like `Long`, `String`, ...?
   // Note: You may want to use the class Ordering from the standard library
-  def generalMin[A](elements: List[A]): Option[A] =
-    ???
-
+  def generalMin[A](elements: List[A])(implicit ord: Ordering[A]): Option[A] =
+    elements.foldLeft(Option.empty[A]) {
+      case (None, element)    => Some(element)
+      case (Some(a), element) => Some(ord.min(a, element))
+    }
 }
