@@ -1,10 +1,8 @@
 package exercises.action.fp
 
-import java.util.concurrent.CountDownLatch
-import scala.annotation.tailrec
-import scala.concurrent.duration.{Duration, FiniteDuration}
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
-import scala.util.{Failure, Success, Try}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.FiniteDuration
+import scala.util.Try
 
 trait IO[A] {
 

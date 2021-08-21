@@ -10,8 +10,8 @@ case class Flight(
   departureAt: Instant,
   duration: Duration,
   numberOfStops: Int, // 0 for a direct flight
-  unitPrice: Double, // in dollars
-  redirectLink: String,
+  unitPrice: Double,  // in dollars
+  redirectLink: String
 ) {
   def departureDate: LocalDate =
     departureAt.atZone(from.timeZone).toLocalDate

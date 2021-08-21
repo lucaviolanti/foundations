@@ -3,8 +3,8 @@ package exercises.dataprocessing
 case class Summary(
   min: Option[Sample], // Sample with lowest temperature
   max: Option[Sample], // Sample with highest temperature
-  sum: Double, // sum of all temperatures in Fahrenheit
-  size: Int // number of Samples
+  sum: Double,         // sum of all temperatures in Fahrenheit
+  size: Int            // number of Samples
 ) {
 
   def average: Option[Double] =

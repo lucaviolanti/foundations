@@ -1,9 +1,8 @@
 package exercises.action.fp.search
 
-import java.time.LocalDate
 import exercises.action.fp.IO
 
-import scala.annotation.tailrec
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 

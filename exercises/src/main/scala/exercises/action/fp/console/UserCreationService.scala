@@ -1,11 +1,9 @@
 package exercises.action.fp.console
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 import exercises.action.fp.IO
 
-import scala.util.{Failure, Success, Try}
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 // Run the App using the green arrow next to object (if using IntelliJ)
 // or run `sbt` in the terminal to open it in shell mode then type:

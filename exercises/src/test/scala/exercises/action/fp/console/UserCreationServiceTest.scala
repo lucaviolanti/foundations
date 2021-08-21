@@ -1,19 +1,14 @@
 package exercises.action.fp.console
 
-import java.time.{Instant, LocalDate}
-
 import exercises.action.DateGenerator._
 import exercises.action.fp.console.UserCreationService._
-import exercises.action.fp
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
+import java.time.{Instant, LocalDate}
 import scala.collection.mutable.ListBuffer
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
-
 import scala.util.{Success, Try}
 
 // Run the test using the green arrow next to class name (if using IntelliJ)

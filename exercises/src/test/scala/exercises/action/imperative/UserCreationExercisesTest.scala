@@ -1,16 +1,12 @@
 package exercises.action.imperative
 
-import java.time.{Instant, LocalDate}
-
 import exercises.action.imperative.UserCreationExercises._
-import exercises.action.DateGenerator._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
+import java.time.{Instant, LocalDate}
 import scala.collection.mutable.ListBuffer
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 // Run the test using the green arrow next to class name (if using IntelliJ)
 // or run `sbt` in the terminal to open it in shell mode, then type:

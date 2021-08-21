@@ -63,21 +63,18 @@ object TemperatureExercises {
         sum = 0.0,
         size = 0
       )
-    )(
-      (state, sample) =>
-        Summary(
-          min = state.min.fold(Some(sample))(
-            current =>
-              if (current.temperatureFahrenheit <= sample.temperatureFahrenheit) Some(current)
-              else Some(sample)
-          ),
-          max = state.max.fold(Some(sample))(
-            current =>
-              if (current.temperatureFahrenheit >= sample.temperatureFahrenheit) Some(current)
-              else Some(sample)
-          ),
-          sum = state.sum + sample.temperatureFahrenheit,
-          size = state.size + 1
+    )((state, sample) =>
+      Summary(
+        min = state.min.fold(Some(sample))(current =>
+          if (current.temperatureFahrenheit <= sample.temperatureFahrenheit) Some(current)
+          else Some(sample)
+        ),
+        max = state.max.fold(Some(sample))(current =>
+          if (current.temperatureFahrenheit >= sample.temperatureFahrenheit) Some(current)
+          else Some(sample)
+        ),
+        sum = state.sum + sample.temperatureFahrenheit,
+        size = state.size + 1
       )
     )
 
