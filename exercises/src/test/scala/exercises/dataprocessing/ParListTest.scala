@@ -6,7 +6,7 @@ import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with ParListTestInstances {
 
-  ignore("minSampleByTemperature example") {
+  test("minSampleByTemperature example") {
     val samples = List(
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 50),
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 56.3),
@@ -18,10 +18,7 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
     )
     val parSamples = ParList.byPartitionSize(3, samples)
 
-    assert(
-      minSampleByTemperature(parSamples) ==
-        Some(Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 22.1))
-    )
+    assert(minSampleByTemperature(parSamples).contains(Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 22.1)))
   }
 
   ignore("minSampleByTemperature returns the coldest Sample") {
