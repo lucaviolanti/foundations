@@ -2,15 +2,21 @@ package exercises.dataprocessing
 
 object TemperatureExercises {
   // b. Implement `minSampleByTemperature` which finds the `Sample` with the coldest temperature.
-  // `minSampleByTemperature` should work as follow:
+  // `minSampleByTemperature` should work as follows:
   // Step 1: Find the local minimums (for each partition the `Sample` with the coldest temperature).
-  // Step 2: Find the minimum value among the local minimums.
+  // Step 2: Find the minimum value among the local minimuma.
   // Note: We'll write test in the file `ParListTest.scala`
   def minSampleByTemperature(samples: ParList[Sample]): Option[Sample] =
-    ???
+    minSample(samples.partitions.flatMap(partition => minSample(partition)))
+
+  private def minSample(partition: List[Sample]): Option[Sample] =
+    partition.foldLeft(Option.empty[Sample]) {
+      case (None, s)         => Some(s)
+      case (Some(oldMin), s) => if (oldMin.temperatureFahrenheit < s.temperatureFahrenheit) Some(oldMin) else Some(s)
+    }
 
   // c. Implement `averageTemperature` which finds the average temperature across all `Samples`.
-  // `averageTemperature` should work as follow:
+  // `averageTemperature` should work as follows:
   // Step 1: Compute the sum of all samples temperatures
   //   a) Compute the sum per partition
   //   b) Sum-up the sum of each partition
@@ -24,7 +30,7 @@ object TemperatureExercises {
     ???
 
   // d. Implement `foldLeft` and then move it inside the class `ParList`.
-  // `foldLeft` should work as follow:
+  // `foldLeft` should work as follows:
   // Step 1: Fold each partition into a single value.
   // Step 2: Fold the intermediate results of all partitions together.
   // For example,
@@ -36,7 +42,7 @@ object TemperatureExercises {
 
   // e. Implement `monoFoldLeft`, a version of `foldLeft` that does not change the element type.
   // Then move `monoFoldLeft` inside  the class `ParList`.
-  // `monoFoldLeft` should work as follow:
+  // `monoFoldLeft` should work as follows:
   // Step 1: Fold each partition into a single value.
   // Step 2: Fold the results of all partitions together.
   // For example,
