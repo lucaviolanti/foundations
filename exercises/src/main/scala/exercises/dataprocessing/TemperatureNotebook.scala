@@ -38,12 +38,16 @@ object TemperatureNotebook extends App {
     ParList.byPartitionSize(partitionSize, samples)
 
   // b. Implement `minSampleByTemperature` in TemperatureExercises
-  lazy val coldestSample: Option[Sample] =
+  val coldestSample: Option[Sample] =
     TemperatureExercises.minSampleByTemperature(parSamples)
 
+  println(s"The coldest sample is $coldestSample")
+
   // c. Implement `averageTemperature` in TemperatureExercises
-  lazy val averageTemperature: Option[Double] =
+  val averageTemperature: Option[Double] =
     TemperatureExercises.averageTemperature(parSamples)
+
+  println(s"The average temperature is $averageTemperature")
 
   //////////////////////
   // Benchmark ParList

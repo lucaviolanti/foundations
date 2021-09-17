@@ -26,8 +26,32 @@ object TemperatureExercises {
   // Step 3: Divide the total temperature by the size of dataset.
   // In case the input `ParList` is empty we return `None`.
   // Bonus: Can you calculate the size and sum in one go?
-  def averageTemperature(samples: ParList[Sample]): Option[Double] =
-    ???
+  //  def averageTemperature(samples: ParList[Sample]): Option[Double] = {
+  //    val totalTemp = totalTemperature(samples)
+  //    val numberOfSamples = size(samples)
+  //    if (numberOfSamples == 0) None
+  //    else Some(totalTemp / numberOfSamples)
+  //  }
+  def totalTemperature(samples: ParList[Sample]): Double =
+    samples.partitions.map(_.map(_.temperatureFahrenheit).sum).sum
+
+  def size(samples: ParList[Sample]): Int = samples.partitions.map(_.size).sum
+
+  def averageTemperature(samples: ParList[Sample]): Option[Double] = {
+    val (sum, size) = sumTuples(samples.partitions.map(sumAndSizePerPartition))
+    if (size == 0) None
+    else Some(sum / size)
+  }
+
+  def sumAndSizePerPartition(partition: List[Sample]): (Double, Int) =
+    partition.foldLeft[(Double, Int)]((0.0, 0)) { case ((sum, size), sample) =>
+      (sum + sample.temperatureFahrenheit, size + 1)
+    }
+
+  def sumTuples(tuples: List[(Double, Int)]): (Double, Int) =
+    tuples.foldLeft[(Double, Int)]((0.0, 0)) { case ((sum1, size1), (sum2, size2)) =>
+      (sum1 + sum2, size1 + size2)
+    }
 
   // d. Implement `foldLeft` and then move it inside the class `ParList`.
   // `foldLeft` should work as follows:
@@ -38,6 +62,9 @@ object TemperatureExercises {
   // Partition 2: List(a2, b2, c2, d2, e2, f2) ->    res2 (intermediate result of partition 2) - finalResult
   // Partition 3:                          Nil -> default (partition 3 is empty)               /
   def foldLeft[From, To](parList: ParList[From], default: To)(combine: (To, From) => To): To =
+//    parList.partitions.map { part =>
+//      part.foldLeft(default)(combine)
+//    }.foldLeft(default)(combine) // cannot be done
     ???
 
   // e. Implement `monoFoldLeft`, a version of `foldLeft` that does not change the element type.
@@ -49,8 +76,8 @@ object TemperatureExercises {
   // Partition 1: List(a1, b1, c1, d1, e1, f1) ->       x   (folded partition 1)  \
   // Partition 2: List(a2, b2, c2, d2, e2, f2) ->       y   (folded partition 2) - z (final result)
   // Partition 3:                          Nil -> default (partition 3 is empty)  /
-  def monoFoldLeft[A](parList: ParList[A], default: A)(combine: (A, A) => A): A =
-    ???
+//  def monoFoldLeft[A](parList: ParList[A], default: A)(combine: (A, A) => A): A =
+//    parList.partitions.map(_.foldLeft(default)(combine)).foldLeft(default)(combine) // <- in ParList now
 
   // `summaryList` iterate 4 times over `samples`, one for each field.
   def summaryList(samples: List[Sample]): Summary =

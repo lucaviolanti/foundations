@@ -6,7 +6,13 @@ package exercises.dataprocessing
 //  List(9,10)             // partition 2
 // )
 // Note that we used the `apply` method with a varargs argument.
-case class ParList[A](partitions: List[List[A]])
+case class ParList[A](partitions: List[List[A]]) {
+  def toList: List[A]                  = partitions.flatten
+  def map[To](f: A => To): ParList[To] = ParList(partitions.map(_.map(f)))
+  def isEmpty: Boolean                 = partitions.isEmpty || partitions.flatten.isEmpty
+  def monoFoldLeft(default: A)(combine: (A, A) => A): A =
+    partitions.map(_.foldLeft(default)(combine)).foldLeft(default)(combine)
+}
 
 object ParList {
   // The `*` at the end of List[A] is called a varargs. It means we can put as many arguments
