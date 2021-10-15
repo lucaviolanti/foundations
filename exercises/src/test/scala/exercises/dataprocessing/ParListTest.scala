@@ -1,7 +1,7 @@
 package exercises.dataprocessing
 
 import exercises.dataprocessing.TemperatureExercises._
-import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
@@ -68,7 +68,13 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
     }
   }
 
-    ignore("summary is consistent between implementations") {
+  test("size is consistent with List size") {
+    forAll { (numbers: ParList[Sample]) =>
+      assert(numbers.size == numbers.toList.size)
+    }
+  }
+
+  ignore("summary is consistent between implementations") {
     forAll { (samples: ParList[Sample]) =>
       val samplesList = samples.partitions.flatten
       val reference   = summaryList(samples.partitions.flatten)
@@ -87,25 +93,35 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
 
   test("monoFoldLeft sum PBT") {
     forAll { (numbers: ParList[Int]) =>
-      assert(numbers.monoFoldLeft(0)(_ + _) == numbers.toList.sum)
+      assert(numbers.monoFoldLeftV1(0)(_ + _) == numbers.toList.sum)
     }
   }
 
-  def checkMonoid[A: Arbitrary](name: String, param: Monoid[A]): Unit = {
-    test(s"MonoFoldParam $name - combine to be a no-op with default") {
-      forAll {(value: A) =>
+  val intGen: Gen[Int]                 = Gen.choose(Int.MinValue, Int.MaxValue)
+  val doubleGen: Gen[Double]           = Gen.choose(-100.0f, 100.0f).map(_.toDouble)
+  val doubleIntGen: Gen[(Double, Int)] = Gen.zip(doubleGen, intGen)
+
+  // implicit override val generatorDrivenConfig: PropertyCheckConfiguration =
+  //   PropertyCheckConfiguration(minSuccessful = 10000)
+
+  checkMonoid("sumInt", Monoid.sumInt, intGen)
+  checkMonoid("sumDouble", Monoid.sumDouble, doubleGen)
+  checkMonoid("sumDoubleInt", Monoid.sumDoubleInt, doubleIntGen)
+  checkMonoid("zip", Monoid.zip(Monoid.sumInt, Monoid.sumInt), Gen.zip(intGen, intGen))
+
+  def checkMonoid[A](name: String, param: Monoid[A], gen: Gen[A]): Unit = {
+    test(s"Monoid $name - combine to be a no-op with default") {
+      forAll(gen) { (value: A) =>
         assert(param.combine(value, param.default) == value)
         assert(param.combine(param.default, value) == value)
       }
     }
 
-    test(s"MonoFoldParam $name - combine is associative") {
-      forAll { (first: A, second: A, third: A) =>
-        val oneWay = param.combine(param.combine(first, second), third)
+    test(s"Monoid $name - combine is associative") {
+      forAll(gen, gen, gen) { (first: A, second: A, third: A) =>
+        val oneWay   = param.combine(param.combine(first, second), third)
         val otherWay = param.combine(first, param.combine(second, third))
       }
     }
   }
-
-  checkMonoid("sumInt", Monoid.sumInt)
 }

@@ -10,8 +10,14 @@ case class ParList[A](partitions: List[List[A]]) {
   def toList: List[A]                  = partitions.flatten
   def map[To](f: A => To): ParList[To] = ParList(partitions.map(_.map(f)))
   def isEmpty: Boolean                 = partitions.isEmpty || partitions.flatten.isEmpty
-  def monoFoldLeft(default: A)(combine: (A, A) => A): A =
+  def monoFoldLeftV1(default: A)(combine: (A, A) => A): A =
     partitions.map(_.foldLeft(default)(combine)).foldLeft(default)(combine)
+  def monoFoldLeft(monoid: Monoid[A]): A =
+    partitions
+      .map(_.foldLeft(monoid.default)(monoid.combine))
+      .foldLeft(monoid.default)(monoid.combine)
+
+  def size: Int = map(_ => 1).monoFoldLeft(Monoid.sumInt)
 }
 
 object ParList {

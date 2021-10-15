@@ -1,5 +1,7 @@
 package exercises.dataprocessing
 
+import exercises.dataprocessing.Monoid.sumDoubleInt
+
 object TemperatureExercises {
   // b. Implement `minSampleByTemperature` which finds the `Sample` with the coldest temperature.
   // `minSampleByTemperature` should work as follows:
@@ -32,26 +34,47 @@ object TemperatureExercises {
   //    if (numberOfSamples == 0) None
   //    else Some(totalTemp / numberOfSamples)
   //  }
-  def totalTemperature(samples: ParList[Sample]): Double =
-    samples.partitions.map(_.map(_.temperatureFahrenheit).sum).sum
 
-  def size(samples: ParList[Sample]): Int = samples.partitions.map(_.size).sum
+  // Now obsolete:
+  //  def averageTemperatureV1(samples: ParList[Sample]): Option[Double] = {
+  //    val (sum, size) = sumTuples(samples.partitions.map(sumAndSizePerPartition))
+  //    if (size == 0) None
+  //    else Some(sum / size)
+  //  }
 
   def averageTemperature(samples: ParList[Sample]): Option[Double] = {
-    val (sum, size) = sumTuples(samples.partitions.map(sumAndSizePerPartition))
+    val (sum, size) = samples
+      .map(sample => (sample.temperatureFahrenheit, 1))
+      .monoFoldLeft(sumDoubleInt)
     if (size == 0) None
     else Some(sum / size)
   }
 
-  def sumAndSizePerPartition(partition: List[Sample]): (Double, Int) =
-    partition.foldLeft[(Double, Int)]((0.0, 0)) { case ((sum, size), sample) =>
-      (sum + sample.temperatureFahrenheit, size + 1)
-    }
+  def sizeV1(samples: ParList[Sample]): Int = samples.partitions.map(_.size).sum
 
-  def sumTuples(tuples: List[(Double, Int)]): (Double, Int) =
-    tuples.foldLeft[(Double, Int)]((0.0, 0)) { case ((sum1, size1), (sum2, size2)) =>
-      (sum1 + sum2, size1 + size2)
-    }
+  def totalTemperature(samples: ParList[Sample]): Double =
+    samples.partitions.map(_.map(_.temperatureFahrenheit).sum).sum
+
+  def sumTemperature(samples: ParList[Sample]): Double =
+    samples
+      .map(sample => sample.temperatureFahrenheit)
+      .monoFoldLeft(Monoid.sumDouble)
+
+  // Moved to the ParList class and made generic
+  // def size(samples: ParList[Sample]): Int =
+  //   samples.map(_ => 1)
+  //     .monoFoldLeft(Monoid.sumInt)
+
+  // Now obsolete:
+  //  def sumAndSizePerPartition(partition: List[Sample]): (Double, Int) =
+  //    partition.foldLeft[(Double, Int)]((0.0, 0)) { case ((sum, size), sample) =>
+  //      (sum + sample.temperatureFahrenheit, size + 1)
+  //    }
+  //
+  //  def sumTuples(tuples: List[(Double, Int)]): (Double, Int) =
+  //    tuples.foldLeft[(Double, Int)]((0.0, 0)) { case ((sum1, size1), (sum2, size2)) =>
+  //      (sum1 + sum2, size1 + size2)
+  //    }
 
   // d. Implement `foldLeft` and then move it inside the class `ParList`.
   // `foldLeft` should work as follows:
