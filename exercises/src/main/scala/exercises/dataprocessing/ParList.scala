@@ -7,17 +7,24 @@ package exercises.dataprocessing
 // )
 // Note that we used the `apply` method with a varargs argument.
 case class ParList[A](partitions: List[List[A]]) {
-  def toList: List[A]                  = partitions.flatten
+  def toList: List[A] = partitions.flatten
+  // def size: Int                     = map(_ => 1).monoFoldLeft(Monoid.sumInt)
+  def size: Int                        = foldMap(_ => 1)(Monoid.sumInt)
   def map[To](f: A => To): ParList[To] = ParList(partitions.map(_.map(f)))
   def isEmpty: Boolean                 = partitions.isEmpty || partitions.flatten.isEmpty
   def monoFoldLeftV1(default: A)(combine: (A, A) => A): A =
     partitions.map(_.foldLeft(default)(combine)).foldLeft(default)(combine)
-  def monoFoldLeft(monoid: Monoid[A]): A =
-    partitions
-      .map(_.foldLeft(monoid.default)(monoid.combine))
-      .foldLeft(monoid.default)(monoid.combine)
 
-  def size: Int = map(_ => 1).monoFoldLeft(Monoid.sumInt)
+  def monoFoldLeft(monoid: Monoid[A]): A =
+    partitions.map(_.foldLeft(monoid.default)(monoid.combine)).foldLeft(monoid.default)(monoid.combine)
+
+  def foldMap[To](update: A => To)(monoid: Monoid[To]): To =
+    // map(update).monoFoldLeft(monoid)
+    partitions
+      .map { partition =>
+        partition.foldLeft(monoid.default)((state: To, value: A) => monoid.combine(state, update(value)))
+      }
+      .foldLeft(monoid.default)(monoid.combine)
 }
 
 object ParList {

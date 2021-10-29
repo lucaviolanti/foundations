@@ -27,4 +27,16 @@ object Monoid {
     override def combine(first: (A, B), second: (A, B)): (A, B) =
       (mA.combine(first._1, second._1), mb.combine(first._2, second._2))
   }
+
+  val minSample: Monoid[Option[Sample]] = new Monoid[Option[Sample]] {
+    override val default: Option[Sample] = None
+
+    override def combine(first: Option[Sample], second: Option[Sample]): Option[Sample] =
+      (first, second) match {
+        case (None, None)         => None
+        case (Some(s), None)      => Some(s)
+        case (None, Some(s))      => Some(s)
+        case (Some(s1), Some(s2)) => if (s1.temperatureFahrenheit < s2.temperatureFahrenheit) Some(s1) else Some(s2)
+      }
+  }
 }

@@ -97,6 +97,14 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
     }
   }
 
+  test("foldMap with identity is consistent with monoFoldLeft") {
+    forAll { (numbers: ParList[Int]) =>
+      val monoid = Monoid.sumInt
+      // Using identity as the simplest update function
+      assert(numbers.foldMap(identity)(monoid) == numbers.monoFoldLeft(monoid))
+    }
+  }
+
   val intGen: Gen[Int]                 = Gen.choose(Int.MinValue, Int.MaxValue)
   val doubleGen: Gen[Double]           = Gen.choose(-100.0f, 100.0f).map(_.toDouble)
   val doubleIntGen: Gen[(Double, Int)] = Gen.zip(doubleGen, intGen)
@@ -108,6 +116,7 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
   checkMonoid("sumDouble", Monoid.sumDouble, doubleGen)
   checkMonoid("sumDoubleInt", Monoid.sumDoubleInt, doubleIntGen)
   checkMonoid("zip", Monoid.zip(Monoid.sumInt, Monoid.sumInt), Gen.zip(intGen, intGen))
+  checkMonoid("minSample", Monoid.minSample, Gen.option(sampleGen))
 
   def checkMonoid[A](name: String, param: Monoid[A], gen: Gen[A]): Unit = {
     test(s"Monoid $name - combine to be a no-op with default") {
