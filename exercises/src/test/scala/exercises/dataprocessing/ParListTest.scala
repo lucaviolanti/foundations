@@ -5,6 +5,8 @@ import org.scalacheck.Gen
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
+import scala.concurrent.ExecutionContext
+
 class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with ParListTestInstances {
 
   test("minSampleByTemperature example") {
@@ -17,7 +19,7 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 34.7),
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 99.0)
     )
-    val parSamples = ParList.byPartitionSize(3, samples)
+    val parSamples = ParList.byPartitionSize(3, samples, ExecutionContext.global)
 
     assert(minSampleByTemperature(parSamples).contains(Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 22.1)))
   }
@@ -30,7 +32,7 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
 
   test("minSampleByTemperature returns the coldest Sample") {
     forAll { (samples: List[Sample]) =>
-      val parSamples = ParList.byPartitionSize(3, samples)
+      val parSamples = ParList.byPartitionSize(3, samples, ExecutionContext.global)
 
       for {
         coldest <- minSampleByTemperature(parSamples)
@@ -49,7 +51,7 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 34.7),
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 99.0)
     )
-    val parSamples = ParList.byPartitionSize(3, samples)
+    val parSamples = ParList.byPartitionSize(3, samples, ExecutionContext.global)
 
     assert(averageTemperature(parSamples).contains(53.6))
   }
@@ -102,6 +104,16 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
       val monoid = Monoid.sumInt
       // Using identity as the simplest update function
       assert(numbers.foldMap(identity)(monoid) == numbers.monoFoldLeft(monoid))
+    }
+  }
+
+  test("parFoldMap is consistent with foldMap") {
+    forAll { (numbers: ParList[Int]) =>
+      val monoid = Monoid.sumInt
+      // Using identity as the simplest update function
+      assert(
+        numbers.parFoldMap(identity)(monoid) == numbers.foldMap(identity)(monoid)
+      )
     }
   }
 

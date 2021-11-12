@@ -1,8 +1,11 @@
 package exercises.dataprocessing
 
+import exercises.dataprocessing.ThreadPoolUtil.fixedSizeExecutionContext
 import exercises.dataprocessing.TimeUtil.{Labelled, bench}
 import kantan.csv._
 import kantan.csv.ops._
+
+import scala.concurrent.ExecutionContext
 
 // Run the notebook using green arrow (if available in your IDE)
 // or run `sbt` in your terminal to open sbt in shell mode then type:
@@ -34,8 +37,9 @@ object TemperatureNotebook extends App {
   // Partition `parSamples` so that it contains 10 partitions of roughly equal size.
   // Note: Check `ParList` companion object
   val partitionSize = math.ceil(samples.size.toDouble / 10).toInt
+  val ec = fixedSizeExecutionContext(6)
   val parSamples: ParList[Sample] =
-    ParList.byPartitionSize(partitionSize, samples)
+    ParList.byPartitionSize(partitionSize, samples, ec)
 
   // b. Implement `minSampleByTemperature` in TemperatureExercises
   val coldestSample: Option[Sample] =
@@ -48,6 +52,8 @@ object TemperatureNotebook extends App {
     TemperatureExercises.averageTemperature(parSamples)
 
   println(s"The average temperature is $averageTemperature")
+
+  parSamples.parFoldMap(_.temperatureFahrenheit)(Monoid.sumDouble)
 
   //////////////////////
   // Benchmark ParList

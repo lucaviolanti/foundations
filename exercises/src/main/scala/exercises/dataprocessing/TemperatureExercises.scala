@@ -10,7 +10,7 @@ object TemperatureExercises {
   // Note: We'll write test in the file `ParListTest.scala`
   def minSampleByTemperature(samples: ParList[Sample]): Option[Sample] =
     // minSample(samples.partitions.flatMap(partition => minSample(partition)))
-    samples.foldMap(Option(_))(Monoid.minSample)
+    samples.parFoldMap(Option(_))(Monoid.minSample)
 
   private def minSample(partition: List[Sample]): Option[Sample] =
     partition.foldLeft(Option.empty[Sample]) {
@@ -48,7 +48,7 @@ object TemperatureExercises {
     //   .map(sample => (sample.temperatureFahrenheit, 1))
     //   .monoFoldLeft(sumDoubleInt)
     val (sum, size) = samples
-      .foldMap(sample => (sample.temperatureFahrenheit, 1))(sumDoubleInt)
+      .parFoldMap(sample => (sample.temperatureFahrenheit, 1))(sumDoubleInt)
     if (size == 0) None
     else Some(sum / size)
   }
@@ -62,7 +62,7 @@ object TemperatureExercises {
     // samples
     //   .map(sample => sample.temperatureFahrenheit)
     //   .monoFoldLeft(Monoid.sumDouble)
-    samples.foldMap(_.temperatureFahrenheit)(Monoid.sumDouble)
+    samples.parFoldMap(_.temperatureFahrenheit)(Monoid.sumDouble)
 
   // Moved to the ParList class and made generic
   // def size(samples: ParList[Sample]): Int =
