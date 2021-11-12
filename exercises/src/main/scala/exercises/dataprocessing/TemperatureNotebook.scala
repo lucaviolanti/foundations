@@ -5,8 +5,6 @@ import exercises.dataprocessing.TimeUtil.{Labelled, bench}
 import kantan.csv._
 import kantan.csv.ops._
 
-import scala.concurrent.ExecutionContext
-
 // Run the notebook using green arrow (if available in your IDE)
 // or run `sbt` in your terminal to open sbt in shell mode then type:
 // exercises/runMain exercises.dataprocessing.TemperatureNotebook
@@ -37,7 +35,7 @@ object TemperatureNotebook extends App {
   // Partition `parSamples` so that it contains 10 partitions of roughly equal size.
   // Note: Check `ParList` companion object
   val partitionSize = math.ceil(samples.size.toDouble / 10).toInt
-  val ec = fixedSizeExecutionContext(6)
+  val ec            = fixedSizeExecutionContext(6)
   val parSamples: ParList[Sample] =
     ParList.byPartitionSize(partitionSize, samples, ec)
 
@@ -66,9 +64,9 @@ object TemperatureNotebook extends App {
   // * TODO ParList parFoldMap
   bench("sum", iterations = 200, warmUpIterations = 40, ignore = true)(
     Labelled("List foldLeft", () => samples.foldLeft(0.0)((state, sample) => state + sample.temperatureFahrenheit)),
-    Labelled("List map + sum", () => samples.map(_.temperatureFahrenheit).sum)
-//    Labelled("ParList foldMap", () => ???),
-//    Labelled("ParList parFoldMap", () => ???),
+    Labelled("List map + sum", () => samples.map(_.temperatureFahrenheit).sum),
+    Labelled("ParList foldMap", () => parSamples.foldMap(_.temperatureFahrenheit)(Monoid.sumDouble)),
+    Labelled("ParList parFoldMap", () => parSamples.parFoldMap(_.temperatureFahrenheit)(Monoid.sumDouble))
   )
 
   // Compare the runtime performance of various implementations of `summary`
