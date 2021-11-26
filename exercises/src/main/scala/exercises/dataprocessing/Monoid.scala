@@ -28,7 +28,13 @@ object Monoid {
       (mA.combine(first._1, second._1), mb.combine(first._2, second._2))
   }
 
-  val minSample: Monoid[Option[Sample]] = new Monoid[Option[Sample]] {
+  val minSample: Monoid[Option[Sample]] =
+    compareSample((s1, s2) => if (s1.temperatureFahrenheit < s2.temperatureFahrenheit) s1 else s2)
+
+  val maxSample: Monoid[Option[Sample]] =
+    compareSample((s1, s2) => if (s1.temperatureFahrenheit > s2.temperatureFahrenheit) s1 else s2)
+
+  def compareSample(compare: (Sample, Sample) => Sample): Monoid[Option[Sample]] = new Monoid[Option[Sample]] {
     override val default: Option[Sample] = None
 
     override def combine(first: Option[Sample], second: Option[Sample]): Option[Sample] =
@@ -36,7 +42,7 @@ object Monoid {
         case (None, None)         => None
         case (Some(s), None)      => Some(s)
         case (None, Some(s))      => Some(s)
-        case (Some(s1), Some(s2)) => if (s1.temperatureFahrenheit < s2.temperatureFahrenheit) Some(s1) else Some(s2)
+        case (Some(s1), Some(s2)) => Some(compare(s1, s2))
       }
   }
 }

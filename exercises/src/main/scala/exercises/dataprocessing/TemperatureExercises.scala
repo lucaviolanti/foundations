@@ -143,15 +143,22 @@ object TemperatureExercises {
   // should return the same result as `summaryList`
   def summaryParList(samples: ParList[Sample]): Summary =
     Summary(
-      min = ???,
-      max = ???,
-      sum = ???,
-      size = ???
+      min = samples.parFoldMap(Option(_))(Monoid.minSample),
+      max = samples.parFoldMap(Option(_))(Monoid.maxSample),
+      sum = samples.parFoldMap(_.temperatureFahrenheit)(Monoid.sumDouble),
+      size = samples.parFoldMap(_ => 1)(Monoid.sumInt)
     )
 
   // Implement `summaryParListOnePass` using `parFoldMap` only ONCE.
   // Note: In `ParListTest.scala`, there is already a test checking that `summaryParListOnePass`
   // should return the same result as `summaryList`
   def summaryParListOnePass(samples: ParList[Sample]): Summary =
-    ???
+    samples.parFoldMap(sampleToSummary)(Summary.monoid)
+
+  def sampleToSummary(sample: Sample): Summary = Summary(
+    min = Some(sample),
+    max = Some(sample),
+    sum = sample.temperatureFahrenheit,
+    size = 1
+  )
 }

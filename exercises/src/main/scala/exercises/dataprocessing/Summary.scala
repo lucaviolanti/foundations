@@ -16,3 +16,17 @@ case class Summary(
       s"min = $min,\n  " +
       s"max = $max\n)"
 }
+
+object Summary {
+  val monoid: Monoid[Summary] = new Monoid[Summary] {
+    override val default: Summary = Summary(min = None, max = None, sum = 0.0, size = 0)
+
+    override def combine(first: Summary, second: Summary): Summary =
+      Summary(
+        min = Monoid.minSample.combine(first.min, second.min),
+        max = Monoid.maxSample.combine(first.max, second.max),
+        sum = first.sum + second.sum,
+        size = first.size + second.size
+      )
+  }
+}
