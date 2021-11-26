@@ -161,4 +161,22 @@ object TemperatureExercises {
     sum = sample.temperatureFahrenheit,
     size = 1
   )
+
+  def sampleToOutput(keys: Sample => List[String])(sample: Sample): Map[String, Summary] =
+    keys(sample).map(key => key -> sampleToSummary(sample)).toMap
+
+  def monoidOutput: Monoid[Map[String, Summary]] = new Monoid[Map[String, Summary]] {
+    override val default: Map[String, Summary] = Map.empty
+
+    override def combine(first: Map[String, Summary], second: Map[String, Summary]): Map[String, Summary] =
+      second.foldLeft(first) { case (state, (city, summary)) =>
+        state.updatedWith(city) {
+          case None                 => Some(summary)
+          case Some(currentSummary) => Some(Summary.monoid.combine(currentSummary, summary))
+        }
+      }
+  }
+
+  def aggregateByLabel(samples: ParList[Sample])(keys: Sample => List[String]): Map[String, Summary] =
+    samples.parFoldMap(sampleToOutput(keys))(monoidOutput)
 }
