@@ -2,7 +2,9 @@ package exercises.action.imperative
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDate}
+import scala.annotation.tailrec
 import scala.io.StdIn
+import scala.util.{Failure, Success, Try}
 
 // Run the App using the green arrow next to object (if using IntelliJ)
 // or run `sbt` in the terminal to open it in shell mode, then type:
@@ -10,22 +12,11 @@ import scala.io.StdIn
 object UserCreationApp extends App {
   import UserCreationExercises._
 
-  readUser()
+  readUser(Console.system, Clock.system)
 }
 
 object UserCreationExercises {
   val dateOfBirthFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-uuuu")
-
-  def readUser(): User = {
-    println("What's your name?")
-    val name = StdIn.readLine()
-    println("What's your date of birth? [dd-mm-yyyy]")
-    val dateOfBirth = LocalDate.parse(StdIn.readLine(), dateOfBirthFormatter)
-    val now         = Instant.now()
-    val user        = User(name, dateOfBirth, true, now)
-    println(s"User is $user")
-    user
-  }
 
   case class User(name: String, dateOfBirth: LocalDate, subscribedToMailingList: Boolean, createdAt: Instant)
 
@@ -116,7 +107,7 @@ object UserCreationExercises {
   def readUser(console: Console, clock: Clock): User = {
     val name        = readName(console)
     val dateOfBirth = readDateOfBirth(console)
-    val subscribed   = readSubscribeToMailingList(console)
+    val subscribed  = readSubscribeToMailingList(console)
     val user        = User(name, dateOfBirth, subscribed, clock.now())
     console.writeLine(s"User is $user")
     user
@@ -143,8 +134,20 @@ object UserCreationExercises {
   // Note: `maxAttempt` must be greater than 0, if not you should throw an exception.
   // Note: You can implement the retry logic using recursion or a for/while loop. I suggest
   //       trying both possibilities.
-  def readSubscribeToMailingListRetry(console: Console, maxAttempt: Int): Boolean =
-    ???
+  @tailrec
+  def readSubscribeToMailingListRetry(console: Console, maxAttempt: Int): Boolean = {
+    require(maxAttempt > 0, "maxAttempt must be > 0")
+
+    console.writeLine("Would you like to subscribe to our mailing list? [Y/N]")
+    val line = console.readLine()
+    Try(parseYesNo(line)) match {
+      case Success(yesNo) => yesNo
+      case Failure(exception) =>
+        console.writeLine(s"""Incorrect format, enter "Y" for Yes or "N" for "No"""")
+        if (maxAttempt == 1) throw exception
+        else readSubscribeToMailingListRetry(console, maxAttempt - 1)
+    }
+  }
 
   // 6. Implement `readDateOfBirthRetry` which behaves like
   // `readDateOfBirth` but retries when the user enters an invalid input.
