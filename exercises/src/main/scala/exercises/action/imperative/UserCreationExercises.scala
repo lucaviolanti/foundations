@@ -14,9 +14,7 @@ object UserCreationApp extends App {
 }
 
 object UserCreationExercises {
-  val dateOfBirthFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-
-  case class User(name: String, dateOfBirth: LocalDate, createdAt: Instant)
+  val dateOfBirthFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-uuuu")
 
   def readUser(): User = {
     println("What's your name?")
@@ -24,10 +22,12 @@ object UserCreationExercises {
     println("What's your date of birth? [dd-mm-yyyy]")
     val dateOfBirth = LocalDate.parse(StdIn.readLine(), dateOfBirthFormatter)
     val now         = Instant.now()
-    val user        = User(name, dateOfBirth, now)
+    val user        = User(name, dateOfBirth, true, now)
     println(s"User is $user")
     user
   }
+
+  case class User(name: String, dateOfBirth: LocalDate, subscribedToMailingList: Boolean, createdAt: Instant)
 
   // 1. Implement `readSubscribeToMailingList` which asks if the user wants to
   // subscribe to our mailing list. They can answer "Y" for yes or "N" for No.
@@ -41,8 +41,21 @@ object UserCreationExercises {
   // Throws an exception.
   // Note: You can read a user input using `StdIn.readLine()`.
   // Note: You can use `throw new IllegalArgumentException("...")` to throw an exception.
-  def readSubscribeToMailingList(): Boolean =
-    ???
+  def readSubscribeToMailingList(): Boolean = {
+    println("Would you like to subscribe to our mailing list? [Y/N]")
+    val line = StdIn.readLine()
+    parseYesNo(line)
+  }
+
+  def formatYesNo(yesNo: Boolean): String =
+    if (yesNo) "Y" else "N"
+
+  def parseYesNo(line: String): Boolean =
+    line match {
+      case "Y"   => true
+      case "N"   => false
+      case other => throw new IllegalArgumentException(s"""Expected "Y" or "N", but received $other""")
+    }
 
   // 2. How can we test `readSubscribeToMailingList`?
   // We cannot use example-based tests or property-based tests
@@ -53,8 +66,11 @@ object UserCreationExercises {
   // Then, try to test this version using property-based testing.
   // Note: Check the `Console` companion object.
   // Bonus: Try to write a property-based test for `readSubscribeToMailingList`
-  def readSubscribeToMailingList(console: Console): Boolean =
-    ???
+  def readSubscribeToMailingList(console: Console): Boolean = {
+    console.writeLine("Would you like to subscribe to our mailing list? [Y/N]")
+    val line = console.readLine()
+    parseYesNo(line)
+  }
 
   // 3. Implement `readDateOfBirth` which asks the date of birth of the user.
   // User must answer using the format `dd-mm-yyyy`, e.g. "18-03-2001" for 18th of March 2001.
@@ -68,8 +84,16 @@ object UserCreationExercises {
   // Throws an exception.
   // Note: You can use `LocalDate.parse` to parse a String into a LocalDate.
   // Note: You can use the formatter `dateOfBirthFormatter` (in scope).
-  def readDateOfBirth(console: Console): LocalDate =
-    ???
+  def readDateOfBirth(console: Console): LocalDate = {
+    console.writeLine("What's your date of birth? [dd-mm-yyyy]")
+    val line = console.readLine()
+    LocalDate.parse(line, dateOfBirthFormatter)
+  }
+
+  def readName(console: Console): String = {
+    console.writeLine("What's your name?")
+    console.readLine()
+  }
 
   // 4. Implement a testable version of `readUser`.
   // For example,
@@ -89,8 +113,14 @@ object UserCreationExercises {
   // Note: You will need to add `subscribedToMailingList: Boolean` field to `User`.
   // Note: How can you mock the current time? Check the `Clock` class in this package
   //       and update the signature of `readUser`.
-  def readUser(console: Console): User =
-    ???
+  def readUser(console: Console, clock: Clock): User = {
+    val name        = readName(console)
+    val dateOfBirth = readDateOfBirth(console)
+    val subscribed   = readSubscribeToMailingList(console)
+    val user        = User(name, dateOfBirth, subscribed, clock.now())
+    console.writeLine(s"User is $user")
+    user
+  }
 
   //////////////////////////////////////////////
   // PART 2: Error handling
