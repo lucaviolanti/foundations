@@ -48,6 +48,9 @@ object UserCreationExercises {
       case other => throw new IllegalArgumentException(s"""Expected "Y" or "N", but received $other""")
     }
 
+  def parseDateOfBirth(line: String): LocalDate =
+    LocalDate.parse(line, dateOfBirthFormatter)
+
   // 2. How can we test `readSubscribeToMailingList`?
   // We cannot use example-based tests or property-based tests
   // because `readSubscribeToMailingList` depends on the
@@ -104,7 +107,7 @@ object UserCreationExercises {
   // Note: You will need to add `subscribedToMailingList: Boolean` field to `User`.
   // Note: How can you mock the current time? Check the `Clock` class in this package
   //       and update the signature of `readUser`.
-  def readUser(console: Console, clock: Clock): User = {
+  def readUserOld(console: Console, clock: Clock): User = {
     val name        = readName(console)
     val dateOfBirth = readDateOfBirth(console)
     val subscribed  = readSubscribeToMailingList(console)
@@ -164,11 +167,31 @@ object UserCreationExercises {
   // [Prompt] Incorrect format, for example enter "18-03-2001" for 18th of March 2001
   // Throws an exception because the user only had 1 attempt and they entered an invalid input.
   // Note: `maxAttempt` must be greater than 0, if not you should throw an exception.
-  def readDateOfBirthRetry(console: Console, maxAttempt: Int): LocalDate =
-    ???
+  @tailrec
+  def readDateOfBirthRetry(console: Console, maxAttempt: Int): LocalDate = {
+    require(maxAttempt > 0, "maxAttempt must be > 0")
+
+    console.writeLine("What's your date of birth? [dd-mm-yyyy]")
+    val line = console.readLine()
+    Try(parseDateOfBirth(line)) match {
+      case Success(date) => date
+      case Failure(exception) =>
+        console.writeLine(s"""Incorrect format, for example enter "18-03-2001" for 18th of March 2001""")
+        if (maxAttempt == 1) throw exception
+        else readDateOfBirthRetry(console, maxAttempt - 1)
+    }
+  }
 
   // 7. Update `readUser` so that it allows the user to make up to 2 mistakes (3 attempts)
   // when entering their date of birth and mailing list subscription flag.
+  def readUser(console: Console, clock: Clock): User = {
+    val name        = readName(console)
+    val dateOfBirth = readDateOfBirthRetry(console, 3)
+    val subscribed  = readSubscribeToMailingListRetry(console, 3)
+    val user        = User(name, dateOfBirth, subscribed, clock.now())
+    console.writeLine(s"User is $user")
+    user
+  }
 
   //////////////////////////////////////////////
   // Bonus question (not covered by the videos)
