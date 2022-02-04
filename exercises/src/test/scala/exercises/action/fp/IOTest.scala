@@ -26,7 +26,7 @@ class IOTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
   }
 
   // replace `ignore` by `test` to enable this test
-  ignore("andThen") {
+  test("andThen") {
     var counter = 0
 
     val first  = IO(counter += 1)
@@ -39,7 +39,7 @@ class IOTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
     assert(counter == 2) // first and second were executed in the expected order
   }
 
-  ignore("map") {
+  test("map") {
     var counter = 0
 
     val first  = IO(counter += 1)
@@ -50,7 +50,7 @@ class IOTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
     assert(counter == 1) // first was executed
   }
 
-  ignore("flatMap") {
+  test("flatMap") {
     var counter = 0
 
     val first  = IO(counter += 1)
