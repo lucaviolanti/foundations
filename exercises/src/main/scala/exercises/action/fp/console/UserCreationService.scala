@@ -50,12 +50,21 @@ class UserCreationService(console: Console, clock: Clock) {
   //
   //  val readDateOfBirth: IO[LocalDate] =
   //    writeLine("What's your date of birth? [dd-mm-yyyy]") andThen readLine flatMap parseDateOfBirth
-  val readDateOfBirth: IO[LocalDate] =
+  //
+  //  val readDateOfBirth: IO[LocalDate] =
+  //    for {
+  //      _    <- writeLine("What's your date of birth? [dd-mm-yyyy]")
+  //      line <- readLine
+  //      dob  <- parseDateOfBirth(line)
+  //    } yield dob
+  val readDateOfBirth: IO[LocalDate] = {
+    val printError = writeLine("Incorrect format, for example enter \"18-03-2001\" for 18th of March 2001")
     for {
       _    <- writeLine("What's your date of birth? [dd-mm-yyyy]")
       line <- readLine
-      dob  <- parseDateOfBirth(line)
+      dob  <- parseDateOfBirth(line).onError(_ => printError)
     } yield dob
+  }
 
   // 3. Refactor `readSubscribeToMailingList` and `readUser` using the same techniques as `readDateOfBirth`.
   //  val readSubscribeToMailingList: IO[Boolean] =
@@ -67,12 +76,21 @@ class UserCreationService(console: Console, clock: Clock) {
   //
   //  val readSubscribeToMailingList: IO[Boolean] =
   //    writeLine("Would you like to subscribe to our mailing list? [Y/N]") andThen readLine flatMap parseLineToBoolean
-  val readSubscribeToMailingList: IO[Boolean] =
+  //
+  //  val readSubscribeToMailingList: IO[Boolean] =
+  //    for {
+  //      _     <- writeLine("Would you like to subscribe to our mailing list? [Y/N]")
+  //      line  <- readLine
+  //      yesNo <- parseLineToBoolean(line)
+  //    } yield yesNo
+  val readSubscribeToMailingList: IO[Boolean] = {
+    val printError = writeLine("Incorrect format, enter \"Y\" for Yes or \"N\" for \"No\"")
     for {
       _     <- writeLine("Would you like to subscribe to our mailing list? [Y/N]")
       line  <- readLine
-      yesNo <- parseLineToBoolean(line)
+      yesNo <- parseLineToBoolean(line).onError(_ => printError)
     } yield yesNo
+  }
 
   //  val readUser: IO[User] =
   //    IO {
@@ -96,10 +114,19 @@ class UserCreationService(console: Console, clock: Clock) {
   //        }
   //      }
   //    }
+  //
+  //  val readUser: IO[User] = for {
+  //    name        <- readName
+  //    dateOfBirth <- readDateOfBirth
+  //    subscribed  <- readSubscribeToMailingList
+  //    now         <- clock.now
+  //    user = User(name, dateOfBirth, subscribed, now)
+  //    _ <- writeLine(s"User is $user")
+  //  } yield user
   val readUser: IO[User] = for {
     name        <- readName
-    dateOfBirth <- readDateOfBirth
-    subscribed  <- readSubscribeToMailingList
+    dateOfBirth <- readDateOfBirth.retry(3)
+    subscribed  <- readSubscribeToMailingList.retry(3)
     now         <- clock.now
     user = User(name, dateOfBirth, subscribed, now)
     _ <- writeLine(s"User is $user")

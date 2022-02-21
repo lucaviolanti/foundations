@@ -90,16 +90,16 @@ class IOTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
     assert(result == Failure(error1))
   }
 
-  ignore("retry, maxAttempt must be greater than 0") {
+  test("retry, maxAttempt must be greater than 0") {
     val retryAction = IO(1).retry(0)
     val result      = Try(retryAction.unsafeRun())
 
     assert(result.isFailure)
   }
 
-  ignore("retry until action succeeds") {
+  test("retry until action succeeds") {
     var counter = 0
-    val error   = new Exception("Boom")
+    val error   = new Exception("maxAttempt must be greater than 0")
     val action = IO {
       counter += 1
       if (counter >= 3) "Hello"
@@ -114,9 +114,9 @@ class IOTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
     assert(counter == 3)
   }
 
-  ignore("retry fails if maxAttempt is too low") {
+  test("retry fails if maxAttempt is too low") {
     var counter = 0
-    val error   = new Exception("Boom")
+    val error   = new Exception("maxAttempt must be greater than 0")
     val action = IO {
       counter += 1
       if (counter >= 3) "Hello"
