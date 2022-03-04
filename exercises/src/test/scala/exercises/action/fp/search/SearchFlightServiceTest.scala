@@ -1,7 +1,9 @@
 package exercises.action.fp.search
 
+import exercises.action.DateGenerator.dateGen
 import exercises.action.fp.IO
 import exercises.action.fp.search.Airport._
+import exercises.action.fp.search.SearchFlightGenerator.{airportGen, clientGen}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
@@ -12,7 +14,7 @@ import java.time.{Duration, Instant, LocalDate}
 // testOnly exercises.action.fp.search.SearchFlightServiceTest
 class SearchFlightServiceTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
 
-  ignore("fromTwoClients example") {
+  test("fromTwoClients example") {
     val now   = Instant.now()
     val today = LocalDate.now()
 
@@ -30,4 +32,27 @@ class SearchFlightServiceTest extends AnyFunSuite with ScalaCheckDrivenPropertyC
     assert(result == SearchResult(List(flight1, flight2, flight3, flight4)))
   }
 
+  test("fromTwoClients should handle errors gracefully") {
+    val now   = Instant.now()
+    val today = LocalDate.now()
+
+    val flight1 = Flight("1", "BA", parisOrly, londonGatwick, now, Duration.ofMinutes(100), 0, 89.5, "")
+
+    val client1 = SearchFlightClient.constant(IO(List(flight1)))
+    val client2 = SearchFlightClient.constant(IO.fail(new RuntimeException("Boom")))
+
+    val service = SearchFlightService.fromTwoClients(client1, client2)
+    val result  = service.search(parisOrly, londonGatwick, today).attempt.unsafeRun()
+
+    assert(result.isSuccess)
+  }
+
+  test("PBT - fromTwoClients should handle errors gracefully") {
+    forAll(airportGen, airportGen, dateGen, clientGen, clientGen) { (from, to, date, client1, client2) =>
+      val service = SearchFlightService.fromTwoClients(client1, client2)
+      val result  = service.search(from, to, date).attempt.unsafeRun()
+
+      assert(result.isSuccess)
+    }
+  }
 }

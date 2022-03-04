@@ -26,5 +26,4 @@ object SearchResult {
   // produces: flight D, flight B, flight C, flight A
   val bestOrdering: Ordering[Flight] =
     Ordering.by(flight => (flight.numberOfStops, flight.unitPrice))
-
 }

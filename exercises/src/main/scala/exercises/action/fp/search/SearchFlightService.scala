@@ -22,22 +22,42 @@ object SearchFlightService {
   // (see `SearchResult` companion object).
   // Note: A example based test is defined in `SearchFlightServiceTest`.
   //       You can also defined tests for `SearchResult` in `SearchResultTest`
-  def fromTwoClients(client1: SearchFlightClient, client2: SearchFlightClient): SearchFlightService =
-    new SearchFlightService {
-      def search(from: Airport, to: Airport, date: LocalDate): IO[SearchResult] =
-        ???
-
-    }
+  //  def fromTwoClients(client1: SearchFlightClient, client2: SearchFlightClient): SearchFlightService =
+  //    new SearchFlightService {
+  //      def search(from: Airport, to: Airport, date: LocalDate): IO[SearchResult] =
+  //        for {
+  //          flights1 <- client1.search(from, to, date)
+  //          flights2 <- client2.search(from, to, date)
+  //        } yield SearchResult(flights1 ++ flights2)
+  //    }
 
   // 2. Several clients can return data for the same flight. For example, if we combine data
   // from British Airways and lastminute.com, lastminute.com may include flights from British Airways.
   // Update `fromTwoClients` so that if we get two or more flights with the same `flightId`,
   // `SearchFlightService` selects the flight with the lowest `unitPrice` and discards the other ones.
+  // ALREADY DONE IN THE APPLY METHOD FOR SEARCHRESULT
+  //  def fromTwoClients(client1: SearchFlightClient, client2: SearchFlightClient): SearchFlightService =
+  //    (from: Airport, to: Airport, date: LocalDate) => for {
+  //      flights1 <- client1.search(from, to, date)
+  //      flights2 <- client2.search(from, to, date)
+  //    } yield {
+  //      SearchResult(flights1 ++ flights2)
+  //    }
 
   // 3. A client may occasionally throw an exception. `fromTwoClients` should
   // handle the error gracefully, for example log a message and ignore the error.
   // In other words, `fromTwoClients` should consider that a client which throws an exception
   // is the same as a client which returns an empty list.
+  def fromTwoClients(client1: SearchFlightClient, client2: SearchFlightClient): SearchFlightService =
+    (from: Airport, to: Airport, date: LocalDate) => {
+      def searchByClient(c: SearchFlightClient): IO[List[Flight]] =
+        c.search(from, to, date).handleErrorWith(e => IO.debug(s"An error occurred: ${e}").andThen(IO(List.empty)))
+
+      for {
+        flights1 <- searchByClient(client1)
+        flights2 <- searchByClient(client2)
+      } yield SearchResult(flights1 ++ flights2)
+    }
 
   // 4. Implement `fromClients` which behaves like `fromTwoClients` but it takes
   // a list of `SearchFlightClient`.
