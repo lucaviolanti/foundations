@@ -212,7 +212,20 @@ object IO {
   // If no error occurs, it returns the users in the same order:
   // List(User(1111, ...), User(2222, ...), User(3333, ...))
   def sequence[A](actions: List[IO[A]]): IO[List[A]] =
-    ???
+//    actions match {
+//      case Nil => IO(Nil)
+//      case head :: next =>
+//        for  {
+//          result1 <- head
+//          result2 <- sequence(next)
+//        } yield result1 :: result2
+//    }
+    actions.foldLeft(IO(List.empty[A]))((state, action) =>
+      for {
+        result1 <- state
+        result2 <- action
+      } yield result2 :: result1
+    ).map(_.reverse)
 
   // `traverse` is a shortcut for `map` followed by `sequence`, similar to how
   // `flatMap`  is a shortcut for `map` followed by `flatten`
