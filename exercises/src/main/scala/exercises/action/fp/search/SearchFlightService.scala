@@ -48,45 +48,63 @@ object SearchFlightService {
   // handle the error gracefully, for example log a message and ignore the error.
   // In other words, `fromTwoClients` should consider that a client which throws an exception
   // is the same as a client which returns an empty list.
-  def fromTwoClients(client1: SearchFlightClient, client2: SearchFlightClient): SearchFlightService =
+  def fromTwoClients(client1: SearchFlightClient, client2: SearchFlightClient, ec: ExecutionContext): SearchFlightService =
     (from: Airport, to: Airport, date: LocalDate) => {
       def searchByClient(c: SearchFlightClient): IO[List[Flight]] =
         c.search(from, to, date).handleErrorWith(e => IO.debug(s"An error occurred: ${e}").andThen(IO(List.empty)))
 
-      for {
-        flights1 <- searchByClient(client1)
-        flights2 <- searchByClient(client2)
-      } yield SearchResult(flights1 ++ flights2)
+//      for {
+//        flights1 <- searchByClient(client1)
+//        flights2 <- searchByClient(client2)
+//      } yield SearchResult(flights1 ++ flights2)
+
+      searchByClient(client1).parZip(searchByClient(client2))(ec)
+        .map { case (flights1, flights2) =>
+          SearchResult(flights1 ++ flights2)
+        }
     }
 
   // 4. Implement `fromClients` which behaves like `fromTwoClients` but it takes
   // a list of `SearchFlightClient`.
   // Note: You can use a recursion/loop/foldLeft to call all the clients and combine their results.
   // Note: We can assume `clients` to contain less than 100 elements.
-  def fromClients(clients: List[SearchFlightClient]): SearchFlightService =
+  //  def fromClients(clients: List[SearchFlightClient]): SearchFlightService =
+  //    new SearchFlightService {
+  //      def search(from: Airport, to: Airport, date: LocalDate): IO[SearchResult] = {
+  //        def searchByClient(c: SearchFlightClient): IO[List[Flight]] =
+  //          c.search(from, to, date).handleErrorWith(e => IO.debug(s"An error occurred: ${e}").andThen(IO(List.empty)))
+  //
+  //        //        def searchAllClients(clients: List[SearchFlightClient]): IO[List[Flight]] =
+  //        //          clients match {
+  //        //            case Nil => IO(Nil)
+  //        //            case client :: otherClients =>
+  //        //              for {
+  //        //                flights1 <- searchByClient(client)
+  //        //                flights2 <- searchAllClients(otherClients)
+  //        //              } yield flights1 ++ flights2
+  //        //          }
+  //        //
+  //        //        searchAllClients(clients).map(SearchResult(_))
+  //
+  //        //        IO.sequence(clients.map(searchByClient))
+  //        //          .map(_.flatten)
+  //        //          .map(SearchResult(_))
+  //
+  //        clients
+  //          .traverse(searchByClient)
+  //          .map(_.flatten)
+  //          .map(SearchResult(_))
+  //      }
+  //    }
+
+  def fromClients(clients: List[SearchFlightClient])(ec: ExecutionContext): SearchFlightService =
     new SearchFlightService {
       def search(from: Airport, to: Airport, date: LocalDate): IO[SearchResult] = {
         def searchByClient(c: SearchFlightClient): IO[List[Flight]] =
           c.search(from, to, date).handleErrorWith(e => IO.debug(s"An error occurred: ${e}").andThen(IO(List.empty)))
 
-        //        def searchAllClients(clients: List[SearchFlightClient]): IO[List[Flight]] =
-        //          clients match {
-        //            case Nil => IO(Nil)
-        //            case client :: otherClients =>
-        //              for {
-        //                flights1 <- searchByClient(client)
-        //                flights2 <- searchAllClients(otherClients)
-        //              } yield flights1 ++ flights2
-        //          }
-        //
-        //        searchAllClients(clients).map(SearchResult(_))
-
-        //        IO.sequence(clients.map(searchByClient))
-        //          .map(_.flatten)
-        //          .map(SearchResult(_))
-
         clients
-          .traverse(searchByClient)
+          .parTraverse(searchByClient)(ec)
           .map(_.flatten)
           .map(SearchResult(_))
       }
