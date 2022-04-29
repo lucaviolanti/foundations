@@ -4,8 +4,6 @@ import org.scalacheck.Gen
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-import java.time.Duration
-import java.util.concurrent.atomic.AtomicInteger
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}

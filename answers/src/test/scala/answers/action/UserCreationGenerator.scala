@@ -1,12 +1,10 @@
 package answers.action
 
-import java.time.format.DateTimeFormatter
-import java.time.{Instant, LocalDate}
-
 import answers.action.imperative.UserCreationAnswers.dateOfBirthFormatter
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Gen
 
+import java.time.format.DateTimeFormatter
 import scala.util.Try
 
 object UserCreationGenerator {

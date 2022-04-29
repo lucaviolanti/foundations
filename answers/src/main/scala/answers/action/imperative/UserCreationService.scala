@@ -2,7 +2,6 @@ package answers.action.imperative
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
 import scala.util.Try
 
 object UserCreationServiceApp extends App {

@@ -2,7 +2,6 @@ package answers.generic
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
 import scala.util.{Failure, Success, Try}
 
 object GenericFunctionAnswers {
@@ -100,11 +99,10 @@ object GenericFunctionAnswers {
   case class User(name: String, age: Int)
 
   val isValidUser: Predicate[User] =
-    Predicate(
-      user =>
-        user.age >= 18 &&
-          user.name.length >= 3 &&
-          user.name.capitalize == user.name
+    Predicate(user =>
+      user.age >= 18 &&
+        user.name.length >= 3 &&
+        user.name.capitalize == user.name
     )
 
   val isAdult: Predicate[User] =
@@ -170,7 +168,7 @@ object GenericFunctionAnswers {
         Try(outer.decode(json)) match {
           case Failure(_)     => fallback.decode(json)
           case Success(value) => value
-      }
+        }
   }
 
   object JsonDecoder {

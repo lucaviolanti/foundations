@@ -11,7 +11,7 @@ case class Flight(
   duration: Duration,
   numberOfStops: Int,
   unitPrice: Double, // in dollars for one passenger
-  redirectLink: String,
+  redirectLink: String
 ) {
   def departureDate: LocalDate =
     departureAt.atZone(from.timeZone).toLocalDate

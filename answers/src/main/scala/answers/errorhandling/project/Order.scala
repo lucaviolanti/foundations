@@ -4,7 +4,6 @@ import answers.errorhandling.project.OrderError._
 import answers.errorhandling.project.OrderStatus._
 
 import java.time.Instant
-import java.util.UUID
 
 case class Order(id: OrderId, createdAt: Instant, status: OrderStatus) {
   def addItem(item: Item): Either[OrderError, Order] =

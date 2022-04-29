@@ -1,10 +1,9 @@
 package answers.action.fp.console
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 import answers.action.fp.IO
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import scala.collection.mutable.ListBuffer
 import scala.io.StdIn
 
@@ -38,10 +37,10 @@ object Console {
 
   val system: Console = new Console {
     val readLine: IO[String] =
-      IO { StdIn.readLine() }
+      IO(StdIn.readLine())
 
     def writeLine(message: String): IO[Unit] =
-      IO { println(message) }
+      IO(println(message))
   }
 
   def mock(inputs: ListBuffer[String], outputs: ListBuffer[String]): Console = new Console {

@@ -1,13 +1,12 @@
 package answers.generic
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 import answers.generic.GenericFunctionAnswers._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import scala.util.Try
 
 class GenericFunctionAnswersTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {

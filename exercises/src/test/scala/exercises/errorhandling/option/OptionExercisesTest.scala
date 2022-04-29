@@ -1,6 +1,5 @@
 package exercises.errorhandling.option
 
-import exercises.errorhandling.option.OptionExercises.Role.Admin.getAccountId
 import exercises.errorhandling.option.OptionExercises.Role._
 import exercises.errorhandling.option.OptionExercises._
 import org.scalatest.funsuite.AnyFunSuite

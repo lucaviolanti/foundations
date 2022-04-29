@@ -1,9 +1,9 @@
 package answers.action.fp.console
 
+import answers.action.fp.IO
+
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
-import answers.action.fp.IO
 
 object UserCreationServiceApp extends App {
   val console = Console.system

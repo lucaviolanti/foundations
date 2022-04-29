@@ -1,8 +1,6 @@
 package exercises.errorhandling.project
 
 import exercises.errorhandling.project.OrderError.{EmptyBasket, InvalidStatus}
-import exercises.errorhandling.project.OrderGenerator._
-import org.scalacheck.Gen
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 

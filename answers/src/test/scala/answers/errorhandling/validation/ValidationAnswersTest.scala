@@ -1,10 +1,10 @@
 package answers.errorhandling.validation
 
 import answers.errorhandling.NEL
-import answers.errorhandling.validation.ValidationAnswers._
-import answers.errorhandling.validation.ValidationAnswers.FormError._
 import answers.errorhandling.validation.ValidationAnswers.Country._
 import answers.errorhandling.validation.ValidationAnswers.FieldIds._
+import answers.errorhandling.validation.ValidationAnswers.FormError._
+import answers.errorhandling.validation.ValidationAnswers._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 

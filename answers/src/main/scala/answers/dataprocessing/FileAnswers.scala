@@ -1,7 +1,6 @@
 package answers.dataprocessing
 
 import java.io.File
-
 import scala.collection.mutable
 
 object FileAnswers {
@@ -43,8 +42,7 @@ object FileAnswers {
     else
       List(file).filter(predicate)
 
-  /**
-    * @see https://stackoverflow.com/questions/3263892/format-file-size-as-mb-gb-etc
+  /** @see https://stackoverflow.com/questions/3263892/format-file-size-as-mb-gb-etc
     * @see https://en.wikipedia.org/wiki/Zettabyte
     * @param fileSize Up to Exabytes
     * @return

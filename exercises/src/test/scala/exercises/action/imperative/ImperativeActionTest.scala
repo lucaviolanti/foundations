@@ -42,13 +42,15 @@ class ImperativeActionTest extends AnyFunSuite with ScalaCheckDrivenPropertyChec
   }
 
   test("onError failure") {
-    var counter = 0
+    var counter   = 0
     val exception = new Exception("Boom")
 
-    val result = Try(onError(
-      action = throw exception,
-      cleanup = _ => counter += 1
-    ))
+    val result = Try(
+      onError(
+        action = throw exception,
+        cleanup = _ => counter += 1
+      )
+    )
 
     assert(result == Failure(exception))
     assert(counter == 1)
@@ -57,10 +59,12 @@ class ImperativeActionTest extends AnyFunSuite with ScalaCheckDrivenPropertyChec
   test("onError success") {
     var counter = 0
 
-    val result = Try(onError(
-      action = "Hello",
-      cleanup = _ => counter += 1
-    ))
+    val result = Try(
+      onError(
+        action = "Hello",
+        cleanup = _ => counter += 1
+      )
+    )
 
     assert(result == Success("Hello"))
     assert(counter == 0)

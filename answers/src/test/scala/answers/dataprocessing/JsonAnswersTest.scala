@@ -12,9 +12,9 @@ class JsonAnswersTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
       "address" -> JsonObject(
         Map(
           "street-number" -> JsonNumber(25),
-          "street-name"   -> JsonString("  Cody Road"),
+          "street-name"   -> JsonString("  Cody Road")
         )
-      ),
+      )
     )
   )
 
@@ -27,9 +27,9 @@ class JsonAnswersTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
           "address" -> JsonObject(
             Map(
               "street-number" -> JsonNumber(25),
-              "street-name"   -> JsonString("Cody Road"),
+              "street-name"   -> JsonString("Cody Road")
             )
-          ),
+          )
         )
       )
     )
@@ -44,9 +44,9 @@ class JsonAnswersTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
           "address" -> JsonObject(
             Map(
               "street-number" -> JsonNumber(0),
-              "street-name"   -> JsonString("***"),
+              "street-name"   -> JsonString("***")
             )
-          ),
+          )
         )
       )
     )

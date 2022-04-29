@@ -3,8 +3,8 @@ package answers.action.fp.search
 import answers.action.fp.search.Airport._
 import answers.action.fp.search.SearchFlightGenerator._
 import answers.action.fp.search.SearchResult.bestOrdering
-import org.scalacheck.Gen
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 

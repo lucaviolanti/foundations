@@ -1,14 +1,14 @@
 package answers.dataprocessing
 
-import java.time.LocalDate
-
 import kantan.csv.RowDecoder
 
+import java.time.LocalDate
+
 case class Sample(
-  region: String, // e.g. Africa, Asia, Australia/South Pacific, Europe, Middle East, North America
-  country: String, // e.g. Algeria, Burundi, Benin, Central African Republic, Congo
+  region: String,        // e.g. Africa, Asia, Australia/South Pacific, Europe, Middle East, North America
+  country: String,       // e.g. Algeria, Burundi, Benin, Central African Republic, Congo
   state: Option[String], // U.S. specific e.g. Alabama, Alaska, Arizona
-  city: String, // e.g. Algiers, Bujumbura, Cotonou, Bangui, Brazzaville
+  city: String,          // e.g. Algiers, Bujumbura, Cotonou, Bangui, Brazzaville
   month: Int,
   day: Int,
   year: Int,
@@ -33,9 +33,8 @@ case class Sample(
 }
 
 object Sample {
-  implicit val decoder: RowDecoder[Sample] = {
+  implicit val decoder: RowDecoder[Sample] =
     RowDecoder
       .decoder(0, 1, 2, 3, 4, 5, 6, 7)(Sample.apply)
       .filter(_.temperatureFahrenheit != -99)
-  }
 }

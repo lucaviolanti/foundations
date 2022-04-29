@@ -1,10 +1,10 @@
 package answers.dataprocessing
 
-import java.io.File
-
+import answers.dataprocessing.FileAnswers._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import FileAnswers._
+
+import java.io.File
 
 class FileAnswersTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
   val scalaSeedProject = new File("PATH_TO_PROJECT/scala-seed-project")

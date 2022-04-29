@@ -1,7 +1,5 @@
 package answers.action.fp.console
 
-import java.time.{Instant, LocalDate}
-
 import answers.action.DateGenerator._
 import answers.action.UserCreationGenerator._
 import answers.action.fp
@@ -11,6 +9,7 @@ import org.scalacheck.Gen
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
+import java.time.{Instant, LocalDate}
 import scala.collection.mutable.ListBuffer
 import scala.util.Success
 
@@ -58,7 +57,7 @@ class UserCreationServiceTest extends AnyFunSuite with ScalaCheckDrivenPropertyC
       assert(
         outputs.toList == List(
           "What's your date of birth? [dd-mm-yyyy]",
-          """Incorrect format, for example enter "18-03-2001" for 18th of March 2001""",
+          """Incorrect format, for example enter "18-03-2001" for 18th of March 2001"""
         )
       )
     }
@@ -91,7 +90,7 @@ class UserCreationServiceTest extends AnyFunSuite with ScalaCheckDrivenPropertyC
       assert(
         outputs.toList == List(
           "Would you like to subscribe to our mailing list? [Y/N]",
-          """Incorrect format, enter "Y" for Yes or "N" for "No"""",
+          """Incorrect format, enter "Y" for Yes or "N" for "No""""
         )
       )
     }

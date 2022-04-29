@@ -48,7 +48,11 @@ object SearchFlightService {
   // handle the error gracefully, for example log a message and ignore the error.
   // In other words, `fromTwoClients` should consider that a client which throws an exception
   // is the same as a client which returns an empty list.
-  def fromTwoClients(client1: SearchFlightClient, client2: SearchFlightClient, ec: ExecutionContext): SearchFlightService =
+  def fromTwoClients(
+    client1: SearchFlightClient,
+    client2: SearchFlightClient,
+    ec: ExecutionContext
+  ): SearchFlightService =
     (from: Airport, to: Airport, date: LocalDate) => {
       def searchByClient(c: SearchFlightClient): IO[List[Flight]] =
         c.search(from, to, date).handleErrorWith(e => IO.debug(s"An error occurred: ${e}").andThen(IO(List.empty)))
@@ -58,7 +62,8 @@ object SearchFlightService {
 //        flights2 <- searchByClient(client2)
 //      } yield SearchResult(flights1 ++ flights2)
 
-      searchByClient(client1).parZip(searchByClient(client2))(ec)
+      searchByClient(client1)
+        .parZip(searchByClient(client2))(ec)
         .map { case (flights1, flights2) =>
           SearchResult(flights1 ++ flights2)
         }

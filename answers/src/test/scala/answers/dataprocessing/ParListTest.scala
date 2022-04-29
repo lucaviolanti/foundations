@@ -20,7 +20,7 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 89.7),
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 22.1),
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 34.7),
-      Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 99.0),
+      Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 99.0)
     )
     val parSamples = ParList.byPartitionSize(global, 3, samples)
 
@@ -59,7 +59,7 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 89.7),
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 22.1),
       Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 34.7),
-      Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 99.0),
+      Sample("Africa", "Algeria", None, "Algiers", 8, 1, 2020, 99.0)
     )
     val parSamples = ParList.byPartitionSize(global, 3, samples)
 
@@ -146,7 +146,7 @@ class ParListTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with P
         TemperatureAnswers.summaryListOnePass(samples.toList),
         TemperatureAnswers.summaryParList(samples),
         TemperatureAnswers.summaryParListOnePassFoldMap(samples),
-        TemperatureAnswers.summaryParListOnePassReduceMap(samples),
+        TemperatureAnswers.summaryParListOnePassReduceMap(samples)
       ).foreach { other =>
         assert(reference.size == other.size)
         assert(reference.sum == other.sum)

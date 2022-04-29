@@ -1,7 +1,7 @@
 package answers.errorhandling.option
 
-import answers.errorhandling.option.OptionAnswers._
 import answers.errorhandling.option.OptionAnswers.Role._
+import answers.errorhandling.option.OptionAnswers._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 

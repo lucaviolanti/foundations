@@ -1,7 +1,6 @@
 package exercises.errorhandling.validation
 
 import exercises.errorhandling.NEL
-import exercises.errorhandling.validation.Validation._
 import exercises.errorhandling.validation.ValidationExercises.FormError._
 
 object ValidationExercises {

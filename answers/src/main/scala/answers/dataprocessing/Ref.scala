@@ -1,7 +1,6 @@
 package answers.dataprocessing
 
 import java.util.concurrent.atomic.AtomicReference
-
 import scala.annotation.tailrec
 
 case class Ref[A](underlying: AtomicReference[A]) {

@@ -115,8 +115,8 @@ object OptionExercises {
   //       inside the `Role` class.
   def asEditor(role: Role): Option[Editor] =
     role match {
-      case _: Reader => None
-      case e: Editor => Some(e)
+      case _: Reader  => None
+      case e: Editor  => Some(e)
       case Role.Admin => None
     }
 }

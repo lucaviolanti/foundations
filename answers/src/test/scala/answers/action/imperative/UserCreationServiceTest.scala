@@ -1,7 +1,5 @@
 package answers.action.imperative
 
-import java.time.LocalDate
-
 import answers.action.DateGenerator._
 import answers.action.UserCreationGenerator._
 import answers.action.imperative.UserCreationService._
@@ -10,6 +8,7 @@ import org.scalacheck.Gen
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
+import java.time.LocalDate
 import scala.collection.mutable.ListBuffer
 import scala.util.{Success, Try}
 

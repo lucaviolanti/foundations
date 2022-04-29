@@ -1,8 +1,8 @@
 package answers.action.fp.search
 
-import java.time.LocalDate
-
 import answers.action.fp.IO
+
+import java.time.LocalDate
 
 trait SearchFlightService {
   def search(from: Airport, to: Airport, date: LocalDate): IO[SearchResult]

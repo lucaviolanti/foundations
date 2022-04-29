@@ -12,11 +12,11 @@ object JsonAnswers {
 
   def trimAll(json: Json): Json =
     json match {
-      case _: JsonNumber | _: JsonBoolean  => json
-      case JsonString(str) => JsonString(str.trim)
+      case _: JsonNumber | _: JsonBoolean => json
+      case JsonString(str)                => JsonString(str.trim)
       case JsonObject(obj) =>
-        JsonObject(obj.map {
-          case (key, value) => key -> trimAll(value)
+        JsonObject(obj.map { case (key, value) =>
+          key -> trimAll(value)
         })
       case JsonArray(array) => JsonArray(array.map(trimAll))
       case JsonNull         => JsonNull
@@ -24,13 +24,12 @@ object JsonAnswers {
 
   def anonymize(json: Json): Json =
     json match {
-      case _: JsonNumber => JsonNumber(0)
+      case _: JsonNumber  => JsonNumber(0)
       case _: JsonBoolean => json
-      case _: JsonString => JsonString("***")
+      case _: JsonString  => JsonString("***")
       case JsonObject(obj) =>
-        JsonObject(obj.map {
-          case (key, value) =>
-            key -> anonymize(value)
+        JsonObject(obj.map { case (key, value) =>
+          key -> anonymize(value)
         })
       case JsonArray(array) => JsonArray(array.map(anonymize))
       case JsonNull         => JsonNull
@@ -41,9 +40,9 @@ object JsonAnswers {
     else
       json match {
         case _: JsonNumber | _: JsonBoolean | JsonNull => false
-        case JsonString(text)         => text.contains(searchText)
-        case JsonObject(obj)          => obj.values.exists(search(_, searchText, maxDepth - 1))
-        case JsonArray(array)         => array.exists(search(_, searchText, maxDepth - 1))
+        case JsonString(text)                          => text.contains(searchText)
+        case JsonObject(obj)                           => obj.values.exists(search(_, searchText, maxDepth - 1))
+        case JsonArray(array)                          => array.exists(search(_, searchText, maxDepth - 1))
       }
 
   def depth(json: Json): Int =
