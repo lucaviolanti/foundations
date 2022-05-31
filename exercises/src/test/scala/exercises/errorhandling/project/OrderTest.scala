@@ -1,6 +1,6 @@
 package exercises.errorhandling.project
 
-import exercises.errorhandling.project.OrderError.{EmptyBasket, InvalidStatus}
+import exercises.errorhandling.project.OrderError.{EmptyBasket, InvalidStatus, MissingDeliveryAddress}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
@@ -8,7 +8,7 @@ import java.time.{Duration, Instant}
 
 class OrderTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
 
-  ignore("checkout successful example") {
+  test("checkout successful example") {
     val order = Order(
       id = "AAA",
       status = "Draft",
@@ -25,7 +25,7 @@ class OrderTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
     }
   }
 
-  ignore("checkout empty basket example") {
+  test("checkout empty basket example") {
     val order = Order(
       id = "AAA",
       status = "Draft",
@@ -39,7 +39,7 @@ class OrderTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
     assert(order.checkout == Left(EmptyBasket))
   }
 
-  ignore("checkout invalid status example") {
+  test("checkout invalid status example") {
     val order = Order(
       id = "AAA",
       status = "Delivered",
@@ -53,7 +53,7 @@ class OrderTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
     assert(order.checkout == Left(InvalidStatus("Delivered")))
   }
 
-  ignore("submit successful example") {
+  test("submit successful example") {
     val order = Order(
       id = "AAA",
       status = "Checkout",
@@ -70,7 +70,7 @@ class OrderTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
     }
   }
 
-  ignore("submit no address example") {
+  test("submit no address example") {
     val order = Order(
       id = "AAA",
       status = "Checkout",
@@ -81,10 +81,10 @@ class OrderTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
       deliveredAt = None
     )
 
-    assert(order.submit(Instant.now()) == Left(???)) // replace ??? by the error you created for that scenario
+    assert(order.submit(Instant.now()) == Left(MissingDeliveryAddress))
   }
 
-  ignore("submit invalid status example") {
+  test("submit invalid status example") {
     val order = Order(
       id = "AAA",
       status = "Delivered",
@@ -98,7 +98,7 @@ class OrderTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
     assert(order.submit(Instant.now()) == Left(InvalidStatus("Delivered")))
   }
 
-  ignore("submit empty basket example") {
+  test("submit empty basket example") {
     val order = Order(
       id = "AAA",
       status = "Checkout",
@@ -112,7 +112,7 @@ class OrderTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
     assert(order.submit(Instant.now()) == Left(EmptyBasket))
   }
 
-  ignore("happy path") {
+  test("happy path") {
     val orderId         = "ORD0001"
     val createdAt       = Instant.now()
     val submittedAt     = createdAt.plusSeconds(5)
@@ -147,5 +147,4 @@ class OrderTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
 
     assert(result.map(_._2) == Right(Duration.ofHours(30)))
   }
-
 }
