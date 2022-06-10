@@ -4,16 +4,14 @@ import exercises.errorhandling.NEL
 import exercises.errorhandling.project.OrderError._
 import exercises.errorhandling.project.OrderStatus._
 
-import java.time.{Duration, Instant}
+import java.time.Instant
+
+case class OrderId(value: String)
 
 case class Order(
-  id: String,
-  status: String,                   // "Draft", "Checkout", "Submitted" or "Delivered"
-  basket: List[Item],               // basket can be modified only in "Draft" or "Checkout"
-  deliveryAddress: Option[Address], // can only be set during "Checkout"
-  createdAt: Instant,               // set when the order is created ("Draft")
-  submittedAt: Option[Instant],     // set when the order is moved to "Submitted"
-  deliveredAt: Option[Instant]      // set when the order is moved to "Delivered"
+  id: OrderId,
+  status: OrderStatus,
+  createdAt: Instant // set when the order is created ("Draft")
 ) {
 
   // Adds an `Item` to the basket.
@@ -25,8 +23,9 @@ case class Order(
 
   def addItems(items: NEL[Item]): Either[OrderError, Order] =
     status match {
-      case Draft | Checkout => Right(copy(status = Draft, basket = basket :++ items.toList))
-      case _                => Left(InvalidStatus(status))
+      case o: Draft    => Right(copy(status = Draft(o.basket ++ items.toList)))
+      case o: Checkout => Right(copy(status = Draft(o.basket.toList ++ items.toList)))
+      case _           => Left(InvalidStatus(status))
     }
 
   // 1. Implement `checkout` which attempts to move the `Order` to "Checkout" status.
@@ -34,16 +33,19 @@ case class Order(
   // `checkout` requires the order to contain at least one item, otherwise it returns an `EmptyBasket` error.
   def checkout: Either[OrderError, Order] =
     status match {
-      case Draft =>
-        if (basket.isEmpty) Left(EmptyBasket)
-        else Right(this.copy(status = Checkout))
+      case o: Draft =>
+        NEL.fromList(o.basket) match {
+          case None        => Left(EmptyBasket)
+          case Some(items) => Right(this.copy(status = Checkout(items, None)))
+        }
       case _ => Left(InvalidStatus(status))
     }
 
   def updateDeliveryAddress(address: Address): Either[OrderError, Order] =
     status match {
-      case Checkout => Right(copy(deliveryAddress = Some(address)))
-      case _        => Left(InvalidStatus(status))
+      case o: Checkout =>
+        Right(copy(status = o.copy(deliveryAddress = Some(address))))
+      case _ => Left(InvalidStatus(status))
     }
 
   // 2. Implement `submit` which attempts to move the `Order` to "Submitted" status.
@@ -53,10 +55,11 @@ case class Order(
   // Note: You may need to extend `OrderError`
   def submit(now: Instant): Either[OrderError, Order] =
     status match {
-      case Checkout =>
-        if (basket.isEmpty) Left(EmptyBasket)
-        else if (deliveryAddress.isEmpty) Left(MissingDeliveryAddress)
-        else Right(copy(status = Submitted, submittedAt = Some(now)))
+      case o: Checkout =>
+        o.deliveryAddress match {
+          case None          => Left(MissingDeliveryAddress)
+          case Some(address) => Right(copy(status = Submitted(o.basket, address, submittedAt = now)))
+        }
       case _ => Left(InvalidStatus(status))
     }
 
@@ -67,30 +70,22 @@ case class Order(
   // If `deliver` succeeds, it also returns the time it took to deliver the order (duration
   // between `submittedAt` and `deliveredAt`).
   // Note: You may need to extend `OrderError`
-  def deliver(now: Instant): Either[OrderError, (Order, Duration)] =
+  def deliver(now: Instant): Either[OrderError, Order] =
     status match {
-      case Submitted =>
-        submittedAt match {
-          case Some(timestamp) =>
-            val newOrder = copy(status = Delivered, deliveredAt = Some(now))
-            val duration = Duration.between(timestamp, now)
-            Right(newOrder, duration)
-          case None => Left(MissingSubmittedAt)
-        }
+      case o: Submitted =>
+        val newOrder =
+          copy(status = Delivered(o.basket, o.deliveryAddress, submittedAt = o.submittedAt, deliveredAt = now))
+        Right(newOrder)
       case _ => Left(InvalidStatus(status))
     }
 }
 
 object Order {
   // Creates an empty draft order.
-  def empty(id: String, now: Instant): Order =
+  def empty(id: OrderId, now: Instant): Order =
     Order(
       id = id,
-      status = Draft,
-      basket = Nil,
-      deliveryAddress = None,
-      createdAt = now,
-      submittedAt = None,
-      deliveredAt = None
+      status = Draft(List.empty),
+      createdAt = now
     )
 }
