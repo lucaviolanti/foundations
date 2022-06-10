@@ -1,10 +1,13 @@
 package exercises.errorhandling.project
 
-import exercises.errorhandling.project.OrderError.{EmptyBasket, InvalidStatus, MissingDeliveryAddress}
+import exercises.errorhandling.project.OrderError._
+import exercises.errorhandling.project.OrderGenerator._
+import exercises.errorhandling.project.OrderStatus._
+import org.scalacheck.Gen
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-import java.time.{Duration, Instant}
+import java.time.Instant
 
 class OrderTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
 
@@ -112,39 +115,42 @@ class OrderTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks {
     assert(order.submit(Instant.now()) == Left(EmptyBasket))
   }
 
+  test("checkout is not allowed if order is in checkout, submitted, or delivered status") {
+    forAll(Gen.oneOf(checkoutGen, submittedGen, deliveredGen)) { order =>
+      assert(order.checkout == Left(InvalidStatus(order.status)))
+    }
+  }
+
   test("happy path") {
-    val orderId         = "ORD0001"
-    val createdAt       = Instant.now()
-    val submittedAt     = createdAt.plusSeconds(5)
-    val deliveredAt     = submittedAt.plusSeconds(3600 * 30) // 30 hours
-    val order           = Order.empty(orderId, createdAt)
-    val item1           = Item("AAA", 2, 24.99)
-    val item2           = Item("BBB", 1, 15.49)
-    val deliveryAddress = Address(23, "E16 8FV")
+    forAll(orderIdGen, instantGen, durationGen, durationGen, nelOf(itemGen), addressGen) {
+      (orderId, createdAt, submittedDelay, deliveredDelay, items, deliveryAddress) =>
+        val submittedAt = createdAt.plus(submittedDelay)
+        val deliveredAt = submittedAt.plus(deliveredDelay)
+        val order       = Order.empty(orderId, createdAt)
 
-    val result = for {
-      order         <- order.addItem(item1)
-      order         <- order.addItem(item2)
-      order         <- order.checkout
-      order         <- order.updateDeliveryAddress(deliveryAddress)
-      order         <- order.submit(submittedAt)
-      orderDuration <- order.deliver(deliveredAt)
-    } yield orderDuration
+        val result = for {
+          order         <- order.addItems(items)
+          order         <- order.checkout
+          order         <- order.updateDeliveryAddress(deliveryAddress)
+          order         <- order.submit(submittedAt)
+          orderDuration <- order.deliver(deliveredAt)
+        } yield orderDuration
 
-    assert(
-      result.map(_._1) == Right(
-        Order(
-          id = orderId,
-          status = "Delivered",
-          basket = List(item1, item2),
-          deliveryAddress = Some(deliveryAddress),
-          createdAt = createdAt,
-          submittedAt = Some(submittedAt),
-          deliveredAt = Some(deliveredAt)
+        assert(
+          result.map(_._1) == Right(
+            Order(
+              id = orderId,
+              status = Delivered,
+              basket = items.toList,
+              deliveryAddress = Some(deliveryAddress),
+              createdAt = createdAt,
+              submittedAt = Some(submittedAt),
+              deliveredAt = Some(deliveredAt)
+            )
+          )
         )
-      )
-    )
 
-    assert(result.map(_._2) == Right(Duration.ofHours(30)))
+        assert(result.map(_._2) == Right(deliveredDelay))
+    }
   }
 }

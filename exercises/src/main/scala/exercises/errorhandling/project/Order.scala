@@ -1,5 +1,6 @@
 package exercises.errorhandling.project
 
+import exercises.errorhandling.NEL
 import exercises.errorhandling.project.OrderError._
 import exercises.errorhandling.project.OrderStatus._
 
@@ -20,8 +21,11 @@ case class Order(
   // If the `Order` is in "Checkout" status, move it back to "Draft".
   // Note: We don't verify if the `Item` is already in the basket.
   def addItem(item: Item): Either[OrderError, Order] =
+    addItems(NEL.one(item))
+
+  def addItems(items: NEL[Item]): Either[OrderError, Order] =
     status match {
-      case Draft | Checkout => Right(copy(status = Draft, basket = basket :+ item))
+      case Draft | Checkout => Right(copy(status = Draft, basket = basket :++ items.toList))
       case _                => Left(InvalidStatus(status))
     }
 

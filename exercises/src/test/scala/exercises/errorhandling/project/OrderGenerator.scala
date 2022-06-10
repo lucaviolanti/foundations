@@ -79,5 +79,4 @@ object OrderGenerator {
 
   val orderGen: Gen[Order] =
     Gen.oneOf(draftGen, checkoutGen, submittedGen, deliveredGen)
-
 }
